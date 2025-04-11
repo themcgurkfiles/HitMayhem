@@ -17,6 +17,14 @@ private:
 
 private:
     bool m_ShowMessage = false;
+
+    // Custom mod bools
+    bool m_CameraOverride = false;
+    bool m_ReviveAllNPCs = false;
+	bool m_KillAllNPCs = false;
+
+    int timeBetweenReviveWaves = 100;
+	int countDown = 0;
 };
 
 DEFINE_ZHM_PLUGIN(ModdingTest)

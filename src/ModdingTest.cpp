@@ -62,6 +62,9 @@ void ModdingTest::OnDrawUI(bool p_HasFocus) {
 void ModdingTest::OnFrameUpdate(const SGameUpdateEvent &p_UpdateEvent) {
     // This function is called every frame while the game is in play mode.
     
+
+
+
     if (m_KillAllNPCs)
     {
         for (int i = 0; i < *Globals::NextActorId; i++)
@@ -82,7 +85,7 @@ void ModdingTest::OnFrameUpdate(const SGameUpdateEvent &p_UpdateEvent) {
 		if (countDown >= timeBetweenReviveWaves)
 		{
             bool m_HasRevived = false;
-            for (int i = 0; i < sizeof(Globals::ActorManager->m_aActiveActors->m_pInterfaceRef); i++)
+            for (int i = 0; i < *Globals::NextActorId; i++)
             {
                 auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
                 if (actor && actor->IsDead()) {
@@ -91,7 +94,7 @@ void ModdingTest::OnFrameUpdate(const SGameUpdateEvent &p_UpdateEvent) {
                     m_HasRevived = true;
                 }
 
-                if (i % 1 == 0 && i > 0 && m_HasRevived)
+                if (i % 5 == 0 && i > 0 && m_HasRevived)
                 {
                     break;
                 }

@@ -23,7 +23,7 @@ private:
     bool m_ReviveAllNPCs = false;
 	bool m_KillAllNPCs = false;
 
-    int timeBetweenReviveWaves = 100;
+    int timeBetweenReviveWaves = 500;
 	int countDown = 0;
 };
 

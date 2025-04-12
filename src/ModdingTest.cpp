@@ -39,6 +39,10 @@ void ModdingTest::OnDrawMenu() {
 	if (ImGui::Button(ICON_MD_LOCK_RESET "Trigger a Random Chaos Event")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteRandomEvent(); }
     }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Debug Chaos Event")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LoadRandomMap); }
+    }
 }
 
 void ModdingTest::OnDrawUI(bool p_HasFocus) {

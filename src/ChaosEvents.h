@@ -16,15 +16,14 @@ public:
 	};
 
 private:
-	void ExecuteEvent(EChaosEvent event);
-	EChaosEvent GetRandomEvent();
-	
 	std::unordered_map<EChaosEvent, std::function<void()>> eventHandlers;
 	void HandleKillAllNPCs();
 	void HandleReviveAllNPCs();
 	void HandleLoadRandomMap();
 
 public:
+	void ExecuteEvent(EChaosEvent event);
+	EChaosEvent GetRandomEvent();
 	void ExecuteRandomEvent();
 
 	ChaosEvents() {

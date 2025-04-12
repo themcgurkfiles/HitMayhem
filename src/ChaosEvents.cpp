@@ -9,6 +9,18 @@
 #include <Glacier/ZInputActionManager.h>
 #include "Glacier/ZMath.h"
 #include "Glacier/ZCameraEntity.h"
+#include <Glacier/ZSetpieceEntity.h>
+#include <Glacier/ZItem.h>
+#include <Glacier/ZHitman5.h>
+
+#include <Glacier/ZSpatialEntity.h>
+#include <Glacier/EntityFactory.h>
+#include <Glacier/ZCollision.h>
+#include <Glacier/ZModule.h>
+#include <Glacier/ZHttp.h>
+#include <Glacier/ZPhysics.h>
+#include <Glacier/ZContentKitManager.h>
+#include <Glacier/ZAction.h>
 
 #include <random>
 
@@ -54,7 +66,7 @@ void ChaosEvents::HandleKillAllNPCs()
         if (actor && actor->IsAlive()) {
             TEntityRef<IItem> s_Item;
             TEntityRef<ZSetpieceEntity> s_SetPieceEntity;
-            Functions::ZActor_KillActor->Call(actor, s_Item, s_SetPieceEntity, EDamageEvent::eDE_Burn, EDeathBehavior::eDB_IMPACT_ANIM);
+            Functions::ZActor_KillActor->Call(actor, s_Item, s_SetPieceEntity, EDamageEvent::eDE_Electric, EDeathBehavior::eDB_IMPACT_ANIM);
             //Logger::Debug("Killing actor: {}", std::to_string(i));
         }
     }
@@ -63,18 +75,31 @@ void ChaosEvents::HandleKillAllNPCs()
 void ChaosEvents::HandleReviveAllNPCs()
 {
     Logger::Debug("HandleReviveAllNPCs");
+    int revivedCount = 0;
     for (int i = 0; i < *Globals::NextActorId; i++)
     {
         auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
-        if (actor && actor->IsDead()) {
+        if (actor && (actor->IsDead() || actor->IsPacified())) {
             Functions::ZActor_ReviveActor->Call(actor);
             Logger::Debug("Reviving actor: {}", std::to_string(i));
+            revivedCount++;
         }
+
+        // Stop at 80: It breaks somewhere in the 90s for some reason
+		if (revivedCount == 80) {
+			Logger::Debug("Finished reviving actors");
+            return;
+		}
     }
 }
 
 void ChaosEvents::HandleLoadRandomMap()
 {
+    // Work in progress
     Logger::Debug("HandleLoadRandomMap");
+	ZSceneData s_SceneData;
+	s_SceneData.m_sceneName = "assembly:/_PRO/Scenes/Frontend/MainMenu.entity";
 
+	ZEntitySceneContext* s_SceneContext = Globals::Hitman5Module->m_pEntitySceneContext;
+	s_SceneContext->LoadScene(s_SceneData);
 }

@@ -18,11 +18,6 @@ private:
 private:
     bool m_ShowMessage = false;
 
-    // Scuffed Revive Stuff
-    bool m_ReviveAllNPCs = false;
-    int timeBetweenReviveWaves = 500;
-	int countDown = 0;
-
     // Chaos Vars
 	ChaosEvents* m_ChaosEvents = nullptr;
 };

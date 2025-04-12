@@ -8,11 +8,11 @@ class ChaosEvents : public IPluginInterface {
 
 public:
 	enum class EChaosEvent {
-		DebugSampleFirstEvent,
+		DebugSampleFirstEvent, // Do not assign
 		KillAllNPCs,
 		ReviveAllNPCs,
 		LoadRandomMap,
-		DebugSampleLastEvent
+		DebugSampleLastEvent   // Do not assign
 	};
 
 private:
@@ -34,15 +34,24 @@ public:
 			{ EChaosEvent::LoadRandomMap, [this]() { HandleLoadRandomMap(); } }
 		};
 	}
-
 };
 
 /*
 
-Chaos ideas:
+Chaos Effect Ideas:
+- Spawn rubber ducks
+- Fire extinguishers
+- Put the targets right next to hitman
+- Aimbot?
+- Lag the camera behind
+- Make the camera go crazy
+- Remove all weapons from inventory
+- Infinite ammo
+- Make all NPCs invisible
+- Make all NPCs enforcers
+
+Other Modifier Ideas:
 - Base time per is 30 sec
 - - Optional: Ability to change time between, maybe no chaos for a time
-
-
 
 */

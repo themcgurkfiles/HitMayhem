@@ -48,22 +48,29 @@ void ChaosEvents::ExecuteRandomEvent()
 void ChaosEvents::HandleKillAllNPCs()
 {
     Logger::Debug("HandleKillAllNPCs");
-    //for (int i = 0; i < *Globals::NextActorId; i++)
-    //{
-    //    auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
-    //    if (actor && actor->IsAlive()) {
-    //        TEntityRef<IItem> s_Item;
-    //        TEntityRef<ZSetpieceEntity> s_SetPieceEntity;
-    //        Functions::ZActor_KillActor->Call(actor, s_Item, s_SetPieceEntity, EDamageEvent::eDE_Burn, EDeathBehavior::eDB_IMPACT_ANIM);
-    //        //Logger::Debug("Killing actor: {}", std::to_string(i));
-    //    }
-    //}
+    for (int i = 0; i < *Globals::NextActorId; i++)
+    {
+        auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
+        if (actor && actor->IsAlive()) {
+            TEntityRef<IItem> s_Item;
+            TEntityRef<ZSetpieceEntity> s_SetPieceEntity;
+            Functions::ZActor_KillActor->Call(actor, s_Item, s_SetPieceEntity, EDamageEvent::eDE_Burn, EDeathBehavior::eDB_IMPACT_ANIM);
+            //Logger::Debug("Killing actor: {}", std::to_string(i));
+        }
+    }
 }
 
 void ChaosEvents::HandleReviveAllNPCs()
 {
     Logger::Debug("HandleReviveAllNPCs");
-
+    for (int i = 0; i < *Globals::NextActorId; i++)
+    {
+        auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
+        if (actor && actor->IsDead()) {
+            Functions::ZActor_ReviveActor->Call(actor);
+            Logger::Debug("Reviving actor: {}", std::to_string(i));
+        }
+    }
 }
 
 void ChaosEvents::HandleLoadRandomMap()

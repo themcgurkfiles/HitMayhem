@@ -35,14 +35,8 @@ ModdingTest::~ModdingTest() {
 
 void ModdingTest::OnDrawMenu() {
     // Toggle our message when the user presses our button.
-    if (ImGui::Button(ICON_MD_LOCAL_HOSPITAL " Revive all NPCs")) {
-        if (m_ReviveAllNPCs == true)
-            Logger::Debug("Revives still in progress!");
-        else
-            m_ReviveAllNPCs = true;
-    }
 
-	if (ImGui::Button(ICON_MD_LOCK_RESET "Random Chaos Event")) {
+	if (ImGui::Button(ICON_MD_LOCK_RESET "Trigger a Random Chaos Event")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteRandomEvent(); }
     }
 }
@@ -53,40 +47,6 @@ void ModdingTest::OnDrawUI(bool p_HasFocus) {
 
 void ModdingTest::OnFrameUpdate(const SGameUpdateEvent &p_UpdateEvent) {
     // This function is called every frame while the game is in play mode.
-
-    if (m_ReviveAllNPCs)
-    {
-		if (countDown >= timeBetweenReviveWaves)
-		{
-            bool m_HasRevived = false;
-            for (int i = 0; i < *Globals::NextActorId; i++)
-            {
-                auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
-                if (actor && actor->IsDead()) {
-                    Functions::ZActor_ReviveActor->Call(actor);
-                    Logger::Debug("Reviving actor: {}", std::to_string(i));
-                    m_HasRevived = true;
-                }
-
-                if (i % 5 == 0 && i > 0 && m_HasRevived)
-                {
-                    break;
-                }
-            }
-
-            if (!m_HasRevived)
-            {
-                m_ReviveAllNPCs = false;
-                Logger::Debug("No actors to revive!");
-            }
-            countDown = 0;
-		}
-
-        else
-        {
-            countDown++;
-        }
-    }
 }
 
 DEFINE_PLUGIN_DETOUR(ModdingTest, void, OnLoadScene, ZEntitySceneContext* th, ZSceneData& p_SceneData) {

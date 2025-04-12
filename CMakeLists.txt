@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD 23)
 add_library(ModdingTest SHARED
     src/ModdingTest.cpp
     src/ModdingTest.h
-)
+ "src/ChaosEvents.cpp")
 
 # Set UTF-8 flag.
 set_target_properties(ModdingTest PROPERTIES COMPILE_FLAGS "/utf-8")

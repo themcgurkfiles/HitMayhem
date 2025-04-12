@@ -1,7 +1,7 @@
 #pragma once
 
 #include <IPluginInterface.h>
-
+#include "ChaosEvents.h"
 #include <Glacier/SGameUpdateEvent.h>
 
 class ModdingTest : public IPluginInterface {
@@ -18,13 +18,13 @@ private:
 private:
     bool m_ShowMessage = false;
 
-    // Custom mod bools
-    bool m_CameraOverride = false;
+    // Scuffed Revive Stuff
     bool m_ReviveAllNPCs = false;
-	bool m_KillAllNPCs = false;
-
     int timeBetweenReviveWaves = 500;
 	int countDown = 0;
+
+    // Chaos Vars
+	ChaosEvents* m_ChaosEvents = nullptr;
 };
 
 DEFINE_ZHM_PLUGIN(ModdingTest)

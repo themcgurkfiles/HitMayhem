@@ -10,7 +10,6 @@
 #include "Glacier/ZMath.h"
 #include "Glacier/ZCameraEntity.h"
 
-
 #include <Glacier/ZGameLoopManager.h>
 #include <Glacier/ZScene.h>
 
@@ -23,6 +22,9 @@ void ModdingTest::OnEngineInitialized() {
 
     // Install a hook to print the name of the scene every time the game loads a new one.
     Hooks::ZEntitySceneContext_LoadScene->AddDetour(this, &ModdingTest::OnLoadScene);
+
+	// Initialize the ChaosEvents class
+    m_ChaosEvents = new ChaosEvents();
 }
 
 ModdingTest::~ModdingTest() {
@@ -33,52 +35,24 @@ ModdingTest::~ModdingTest() {
 
 void ModdingTest::OnDrawMenu() {
     // Toggle our message when the user presses our button.
-    if (ImGui::Button(ICON_MD_LOCAL_FIRE_DEPARTMENT " Kill all NPCs")) {
-        if (m_KillAllNPCs == true)
-            Logger::Debug("Kills still in progress!");
-        else
-            m_KillAllNPCs = true;
-    }
-
     if (ImGui::Button(ICON_MD_LOCAL_HOSPITAL " Revive all NPCs")) {
         if (m_ReviveAllNPCs == true)
             Logger::Debug("Revives still in progress!");
         else
             m_ReviveAllNPCs = true;
     }
+
+	if (ImGui::Button(ICON_MD_LOCK_RESET "Random Chaos Event")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteRandomEvent(); }
+    }
 }
 
 void ModdingTest::OnDrawUI(bool p_HasFocus) {
-    if (m_ShowMessage) {
-        // Show a window for our mod.
-        if (ImGui::Begin("ModdingTest", &m_ShowMessage)) {
-            // Only show these when the window is expanded.
-            ImGui::Text("Hello from ModdingTest!");
-        }
-        ImGui::End();
-    }
+
 }
 
 void ModdingTest::OnFrameUpdate(const SGameUpdateEvent &p_UpdateEvent) {
     // This function is called every frame while the game is in play mode.
-    
-
-
-
-    if (m_KillAllNPCs)
-    {
-        for (int i = 0; i < *Globals::NextActorId; i++)
-        {
-            auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
-            if (actor && actor->IsAlive()) {
-                TEntityRef<IItem> s_Item;
-                TEntityRef<ZSetpieceEntity> s_SetPieceEntity;
-                Functions::ZActor_KillActor->Call(actor, s_Item, s_SetPieceEntity, EDamageEvent::eDE_Burn, EDeathBehavior::eDB_IMPACT_ANIM);
-                Logger::Debug("Killing actor: {}", std::to_string(i));
-            }
-        }
-        m_KillAllNPCs = false;
-    }
 
     if (m_ReviveAllNPCs)
     {

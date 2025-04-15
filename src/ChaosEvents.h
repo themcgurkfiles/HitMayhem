@@ -7,22 +7,36 @@
 class ChaosEvents : public IPluginInterface {
 
 public:
+	
+	void OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent);
+	
 	// The debug events may or may not be needed, at least random won't pick them.
 	enum class EChaosEvent { 
 		DebugSampleFirstEvent, // Do not assign
-		KillAllNPCs,
-		ReviveAllNPCs,
+		KillAura,
+		ReviveAura,
 		LoadRandomMap,
 		RemoveAllWeapons,
 		InfiniteAmmo,
 		MakeAllNPCsInvisible,
+		RandomTeleport,
+		SpawnFireExtinguishers,
+		SpawnRubberDucks,
 		DebugSampleLastEvent   // Do not assign
 	};
 
+	struct ChaosEventData {
+		std::function<void()> effectFunction;
+		int effectDuration;
+		bool isEffectActive;
+	};
+
 private:
-	std::unordered_map<EChaosEvent, std::function<void()>> eventHandlers;
-	void HandleKillAllNPCs();
-	void HandleReviveAllNPCs();
+	std::unordered_map<EChaosEvent, ChaosEventData> eventHandlers;
+	std::unordered_map<EChaosEvent, ChaosEventData> activeEffects;
+	EChaosEvent m_CurrentEvent = EChaosEvent::DebugSampleFirstEvent;
+	void HandleKillAura();
+	void HandleReviveAura();
 	void HandleLoadRandomMap();
 	void HandleRemoveAllWeapons();
 	void HandleInfiniteAmmo();
@@ -35,15 +49,14 @@ public:
 
 	ChaosEvents() {
 		eventHandlers = {
-			{ EChaosEvent::KillAllNPCs, [this]() { HandleKillAllNPCs(); } },
-			{ EChaosEvent::ReviveAllNPCs, [this]() { HandleReviveAllNPCs(); } },
-			{ EChaosEvent::LoadRandomMap, [this]() { HandleLoadRandomMap(); } },
-			{ EChaosEvent::RemoveAllWeapons, [this]() { HandleRemoveAllWeapons(); } },
-			{ EChaosEvent::InfiniteAmmo, [this]() { HandleInfiniteAmmo(); } },
-			{ EChaosEvent::MakeAllNPCsInvisible, [this]() { HandleMakeAllNPCsInvisible(); } }
+			{ EChaosEvent::KillAura, {[this]() { HandleKillAura(); }, 1000, false} },
+			{ EChaosEvent::ReviveAura, {[this]() { HandleReviveAura(); }, 1000, false} },
+			{ EChaosEvent::LoadRandomMap, {[this]() { HandleLoadRandomMap(); }, 1000, false} },
+			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(); }, 1000, false} },
+			{ EChaosEvent::InfiniteAmmo, {[this]() { HandleInfiniteAmmo(); }, 1000, false} },
+			{ EChaosEvent::MakeAllNPCsInvisible, {[this]() { HandleMakeAllNPCsInvisible(); }, 1000, false} }
 		};
 	}
-
 
 	ZSceneData* m_LastLoadedScene = nullptr;
 	ZEntitySceneContext* m_LastLoadedSceneContext = nullptr;

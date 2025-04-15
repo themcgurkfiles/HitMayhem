@@ -16,21 +16,14 @@
 void ModdingTest::OnEngineInitialized() {
     Logger::Info("ModdingTest has been initialized!");
 
-    // Register a function to be called on every game frame while the game is in play mode.
-    const ZMemberDelegate<ModdingTest, void(const SGameUpdateEvent&)> s_Delegate(this, &ModdingTest::OnFrameUpdate);
+    // Initialize the ChaosEvents class
+    m_ChaosEvents = new ChaosEvents();
+
+	const ZMemberDelegate<ChaosEvents, void(const SGameUpdateEvent&)> s_Delegate(m_ChaosEvents, &ChaosEvents::OnFrameUpdate);
     Globals::GameLoopManager->RegisterFrameUpdate(s_Delegate, 1, EUpdateMode::eUpdatePlayMode);
 
     // Install a hook to print the name of the scene every time the game loads a new one.
     Hooks::ZEntitySceneContext_LoadScene->AddDetour(this, &ModdingTest::OnLoadScene);
-
-	// Initialize the ChaosEvents class
-    m_ChaosEvents = new ChaosEvents();
-}
-
-ModdingTest::~ModdingTest() {
-    // Unregister our frame update function when the mod unloads.
-    const ZMemberDelegate<ModdingTest, void(const SGameUpdateEvent&)> s_Delegate(this, &ModdingTest::OnFrameUpdate);
-    Globals::GameLoopManager->UnregisterFrameUpdate(s_Delegate, 1, EUpdateMode::eUpdatePlayMode);
 }
 
 void ModdingTest::OnDrawMenu() {
@@ -40,17 +33,19 @@ void ModdingTest::OnDrawMenu() {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteRandomEvent(); }
     }
 
-    //if (ImGui::Button(ICON_MD_LOCK_RESET "Debug Chaos Event")) {
-    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LoadRandomMap); }
-    //}
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Kill Aura")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::KillAura); }
+    }
 }
 
 void ModdingTest::OnDrawUI(bool p_HasFocus) {
 
 }
 
-void ModdingTest::OnFrameUpdate(const SGameUpdateEvent &p_UpdateEvent) {
-    // This function is called every frame while the game is in play mode.
+ModdingTest::~ModdingTest()
+{
+    const ZMemberDelegate<ChaosEvents, void(const SGameUpdateEvent&)> s_Delegate(m_ChaosEvents, &ChaosEvents::OnFrameUpdate);
+    Globals::GameLoopManager->UnregisterFrameUpdate(s_Delegate, 1, EUpdateMode::eUpdatePlayMode);
 }
 
 DEFINE_PLUGIN_DETOUR(ModdingTest, void, OnLoadScene, ZEntitySceneContext* th, ZSceneData& p_SceneData) {

@@ -7,16 +7,14 @@
 class ModdingTest : public IPluginInterface {
 public:
     void OnEngineInitialized() override;
-    ~ModdingTest() override;
     void OnDrawMenu() override;
     void OnDrawUI(bool p_HasFocus) override;
+	~ModdingTest() override;
 
 private:
-    void OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent);
     DECLARE_PLUGIN_DETOUR(ModdingTest, void, OnLoadScene, ZEntitySceneContext* th, ZSceneData& p_SceneData);
 
 private:
-    bool m_ShowMessage = false;
 
     // Chaos Vars
 	ChaosEvents* m_ChaosEvents = nullptr;

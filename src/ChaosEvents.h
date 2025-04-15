@@ -7,11 +7,15 @@
 class ChaosEvents : public IPluginInterface {
 
 public:
-	enum class EChaosEvent {
+	// The debug events may or may not be needed, at least random won't pick them.
+	enum class EChaosEvent { 
 		DebugSampleFirstEvent, // Do not assign
 		KillAllNPCs,
 		ReviveAllNPCs,
 		LoadRandomMap,
+		RemoveAllWeapons,
+		InfiniteAmmo,
+		MakeAllNPCsInvisible,
 		DebugSampleLastEvent   // Do not assign
 	};
 
@@ -20,6 +24,9 @@ private:
 	void HandleKillAllNPCs();
 	void HandleReviveAllNPCs();
 	void HandleLoadRandomMap();
+	void HandleRemoveAllWeapons();
+	void HandleInfiniteAmmo();
+	void HandleMakeAllNPCsInvisible();
 
 public:
 	void ExecuteEvent(EChaosEvent event);
@@ -30,9 +37,16 @@ public:
 		eventHandlers = {
 			{ EChaosEvent::KillAllNPCs, [this]() { HandleKillAllNPCs(); } },
 			{ EChaosEvent::ReviveAllNPCs, [this]() { HandleReviveAllNPCs(); } },
-			{ EChaosEvent::LoadRandomMap, [this]() { HandleLoadRandomMap(); } }
+			{ EChaosEvent::LoadRandomMap, [this]() { HandleLoadRandomMap(); } },
+			{ EChaosEvent::RemoveAllWeapons, [this]() { HandleRemoveAllWeapons(); } },
+			{ EChaosEvent::InfiniteAmmo, [this]() { HandleInfiniteAmmo(); } },
+			{ EChaosEvent::MakeAllNPCsInvisible, [this]() { HandleMakeAllNPCsInvisible(); } }
 		};
 	}
+
+
+	ZSceneData* m_LastLoadedScene = nullptr;
+	ZEntitySceneContext* m_LastLoadedSceneContext = nullptr;
 };
 
 /*

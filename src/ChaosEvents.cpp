@@ -40,8 +40,8 @@ ChaosEvents::EChaosEvent ChaosEvents::GetRandomEvent()
     std::random_device rd;                       
     std::mt19937 gen(rd());                      
     std::uniform_int_distribution<> dist(
-        static_cast<int>(EChaosEvent::KillAllNPCs),
-        static_cast<int>(EChaosEvent::LoadRandomMap)
+        static_cast<int>(EChaosEvent::DebugSampleFirstEvent) + 1,
+        static_cast<int>(EChaosEvent::DebugSampleLastEvent) - 1
     );
 
     // Get a random event
@@ -84,9 +84,9 @@ void ChaosEvents::HandleReviveAllNPCs()
             Logger::Debug("Reviving actor: {}", std::to_string(i));
             revivedCount++;
         }
-
+    
         // Stop at 80: It breaks somewhere in the 90s for some reason
-		if (revivedCount == 80) {
+		if (revivedCount == 40) {
 			Logger::Debug("Finished reviving actors");
             return;
 		}
@@ -97,9 +97,26 @@ void ChaosEvents::HandleLoadRandomMap()
 {
     // Work in progress
     Logger::Debug("HandleLoadRandomMap");
-	ZSceneData s_SceneData;
-	s_SceneData.m_sceneName = "assembly:/_PRO/Scenes/Frontend/MainMenu.entity";
+	//ZSceneData s_SceneData;
+	//s_SceneData.m_sceneName = "assembly:/_PRO/Scenes/Frontend/MainMenu.entity";
+    //
+	//ZEntitySceneContext* s_SceneContext = Globals::Hitman5Module->m_pEntitySceneContext;
+	//s_SceneContext->LoadScene(s_SceneData);
+    //Logger::Debug("HandleLoadRandomMap: Loading scene: {}", &m_LastLoadedScene->m_sceneName);
+	m_LastLoadedSceneContext->LoadScene(*m_LastLoadedScene);
+}
 
-	ZEntitySceneContext* s_SceneContext = Globals::Hitman5Module->m_pEntitySceneContext;
-	s_SceneContext->LoadScene(s_SceneData);
+void ChaosEvents::HandleRemoveAllWeapons()
+{
+    Logger::Debug("HandleRemoveAllWeapons");
+}
+
+void ChaosEvents::HandleInfiniteAmmo()
+{
+    Logger::Debug("HandleInfiniteAmmo");
+}
+
+void ChaosEvents::HandleMakeAllNPCsInvisible()
+{
+    Logger::Debug("HandleMakeAllNPCsInvisible");
 }

@@ -40,9 +40,9 @@ void ModdingTest::OnDrawMenu() {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteRandomEvent(); }
     }
 
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Debug Chaos Event")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LoadRandomMap); }
-    }
+    //if (ImGui::Button(ICON_MD_LOCK_RESET "Debug Chaos Event")) {
+    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LoadRandomMap); }
+    //}
 }
 
 void ModdingTest::OnDrawUI(bool p_HasFocus) {
@@ -55,6 +55,8 @@ void ModdingTest::OnFrameUpdate(const SGameUpdateEvent &p_UpdateEvent) {
 
 DEFINE_PLUGIN_DETOUR(ModdingTest, void, OnLoadScene, ZEntitySceneContext* th, ZSceneData& p_SceneData) {
     Logger::Debug("Loading scene: {}", p_SceneData.m_sceneName);
+    m_ChaosEvents->m_LastLoadedScene = &p_SceneData;
+	m_ChaosEvents->m_LastLoadedSceneContext = th;
     return HookResult<void>(HookAction::Continue());
 }
 

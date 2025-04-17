@@ -14,16 +14,22 @@ public:
 	// The debug events may or may not be needed, at least random won't pick them.
 	enum class EChaosEvent { 
 		DebugSampleFirstEvent, // Do not assign
+
+		// All working effects:
 		KillAura,
 		ReviveAura,
-		LoadRandomMap,
-		RemoveAllWeapons,
 		InfiniteAmmo,
-		MakeAllNPCsInvisible,
 		Make47Invincible,
-		RandomTeleport,
-		SpawnFireExtinguishers,
-		SpawnRubberDucks,
+
+		// TODO Effects: As of now, don't work
+		RemoveAllWeapons,
+		MakeAllNPCsInvisible,
+		MakeAllNPCsEnforcers,
+		//SpawnFireExtinguishers,
+		//SpawnRubberDucks,
+		//SpawnRandomExplosions,
+		//RandomTeleport,
+
 		DebugSampleLastEvent   // Do not assign
 	};
 
@@ -43,11 +49,13 @@ private:
 	EChaosEvent m_CurrentEvent = EChaosEvent::DebugSampleFirstEvent;
 	void HandleKillAura();
 	void HandleReviveAura();
-	void HandleLoadRandomMap();
-	void HandleRemoveAllWeapons();
 	void HandleInfiniteAmmo();
-	void HandleMakeAllNPCsInvisible();
 	void HandleMake47Invincible();
+
+	void HandleRemoveAllWeapons();
+	void HandleMakeAllNPCsInvisible();
+	void HandleMakeAllNPCsEnforcers();
+	
 
 public:
 	void ExecuteEvent(EChaosEvent event);
@@ -57,13 +65,14 @@ public:
 
 	ChaosEvents() {
 		eventHandlers = {
-			{ EChaosEvent::KillAura, {[this]() { HandleKillAura(); }, 1000} },
-			{ EChaosEvent::ReviveAura, {[this]() { HandleReviveAura(); }, 1000} },
-			{ EChaosEvent::LoadRandomMap, {[this]() { HandleLoadRandomMap(); }, 1} },
-			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(); }, 1000} },
-			{ EChaosEvent::InfiniteAmmo, {[this]() { HandleInfiniteAmmo(); }, 1000} },
+			{ EChaosEvent::KillAura, {[this]() { HandleKillAura(); }, 10000} },
+			{ EChaosEvent::ReviveAura, {[this]() { HandleReviveAura(); }, 10000} },
+			{ EChaosEvent::InfiniteAmmo, {[this]() { HandleInfiniteAmmo(); }, 10000} },
+			{ EChaosEvent::Make47Invincible, {[this]() { HandleMake47Invincible(); }, 10000} },
+
+			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(); }, 1} },
 			{ EChaosEvent::MakeAllNPCsInvisible, {[this]() { HandleMakeAllNPCsInvisible(); }, 1000} },
-			{ EChaosEvent::Make47Invincible, {[this]() { HandleMake47Invincible(); }, 1000} }
+			{ EChaosEvent::MakeAllNPCsEnforcers, {[this]() { HandleMakeAllNPCsEnforcers(); }, 1000} }
 		};
 	}
 

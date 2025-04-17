@@ -12,6 +12,7 @@
 #include <Glacier/ZSetpieceEntity.h>
 #include <Glacier/ZItem.h>
 #include <Glacier/ZHitman5.h>
+#include <Glacier/ZInventory.h>
 
 #include <Glacier/ZSpatialEntity.h>
 #include <Glacier/EntityFactory.h>
@@ -163,27 +164,9 @@ void ChaosEvents::HandleReviveAura()
     }
 }
 
-void ChaosEvents::HandleLoadRandomMap()
-{
-    // Work in progress
-    Logger::Debug("HandleLoadRandomMap");
-	//ZSceneData s_SceneData;
-	//s_SceneData.m_sceneName = "assembly:/_PRO/Scenes/Frontend/MainMenu.entity";
-    //
-	//ZEntitySceneContext* s_SceneContext = Globals::Hitman5Module->m_pEntitySceneContext;
-	//s_SceneContext->LoadScene(s_SceneData);
-    //Logger::Debug("HandleLoadRandomMap: Loading scene: {}", &m_LastLoadedScene->m_sceneName);
-	//m_LastLoadedSceneContext->LoadScene(*m_LastLoadedScene);
-}
-
-void ChaosEvents::HandleRemoveAllWeapons()
-{
-    Logger::Debug("HandleRemoveAllWeapons");
-}
-
 void ChaosEvents::HandleInfiniteAmmo()
 {
-    Logger::Debug("HandleInfiniteAmmo");
+    //Logger::Debug("HandleInfiniteAmmo");
 
     auto it = activeEffects.find(EChaosEvent::InfiniteAmmo);
     if (it != activeEffects.end()) {
@@ -213,17 +196,11 @@ void ChaosEvents::HandleInfiniteAmmo()
     }
 }
 
-void ChaosEvents::HandleMakeAllNPCsInvisible()
-{
-    Logger::Debug("HandleMakeAllNPCsInvisible");
-}
-
 void ChaosEvents::HandleMake47Invincible()
 {
-    Logger::Debug("HandleMake47Invincible");
+    //Logger::Debug("HandleMake47Invincible");
 
     auto player = SDK()->GetLocalPlayer();
-    const auto playerPos = SDK()->GetLocalPlayer().m_ref.QueryInterface<ZHM5HitmanHealthModifier_EHealthValue>();
 
     if (player.m_pInterfaceRef->m_bIsInvincible == false)
     {
@@ -238,5 +215,39 @@ void ChaosEvents::HandleMake47Invincible()
             return;
         }
     }
-    
+
+}
+
+void ChaosEvents::HandleRemoveAllWeapons()
+{
+    Logger::Debug("HandleRemoveAllWeapons");
+
+    auto s_LocalHitman = SDK()->GetLocalPlayer();
+
+    if (!s_LocalHitman) {
+        Logger::Debug("No local hitman");
+        return;
+    }
+
+    if (true) {
+        const TArray<TEntityRef<ZCharacterSubcontroller>>* s_Controllers = &s_LocalHitman.m_pInterfaceRef->m_pCharacter.
+            m_pInterfaceRef->m_rSubcontrollerContainer.m_pInterfaceRef->m_aReferencedControllers;
+        auto* s_Inventory = static_cast<ZCharacterSubcontrollerInventory*>(s_Controllers->operator[](6).
+            m_pInterfaceRef);
+
+        TArray<ZRepositoryID> s_ModifierIds;
+        //s_Inventory->
+
+        return;
+    }
+}
+
+void ChaosEvents::HandleMakeAllNPCsInvisible()
+{
+    Logger::Debug("HandleMakeAllNPCsInvisible");
+}
+
+void ChaosEvents::HandleMakeAllNPCsEnforcers()
+{
+	Logger::Debug("HandleMakeAllNPCsEnforcers");
 }

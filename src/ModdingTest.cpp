@@ -36,6 +36,18 @@ void ModdingTest::OnDrawMenu() {
     if (ImGui::Button(ICON_MD_LOCK_RESET "Kill Aura")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::KillAura); }
     }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Revive Aura")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::ReviveAura); }
+    }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Invincible")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent:: Make47Invincible); }
+    }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Infinite Ammo")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::InfiniteAmmo); }
+    }
 }
 
 void ModdingTest::OnDrawUI(bool p_HasFocus) {

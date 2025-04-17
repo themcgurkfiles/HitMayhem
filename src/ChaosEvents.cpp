@@ -33,13 +33,19 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
     for (auto it = activeEffects.begin(); it != activeEffects.end(); ) {
         auto& effect = it->second;
         if (effect.isEffectActive) {
-            effect.effectFunction();
-            effect.effectDuration--;
             if (effect.effectDuration <= 0) {
                 effect.isEffectActive = false;
                 Logger::Debug("Effect {} has ended.", static_cast<int>(it->first));
                 it = activeEffects.erase(it);  // erase returns a valid next iterator
                 continue;
+            }
+
+            else
+            {
+                effect.effectFunction();
+                effect.effectDuration--;
+                if (effect.justStarted)
+                    effect.justStarted = false;
             }
         }
         ++it;
@@ -51,7 +57,6 @@ void ChaosEvents::ExecuteEvent(EChaosEvent event)
 {
 	auto it = eventHandlers.find(event);
 	if (it != eventHandlers.end()) {
-        //it->second.effectFunction();
 		m_CurrentEvent = event;
         it->second.isEffectActive = true;
 		activeEffects.insert({ event, it->second });
@@ -77,6 +82,39 @@ void ChaosEvents::ExecuteRandomEvent()
 	EChaosEvent randomEvent = GetRandomEvent();
     Logger::Debug("Getting Random Event {}...", static_cast<int>(randomEvent));
     ExecuteEvent(randomEvent);
+}
+
+void ChaosEvents::CreateCrippleBox()
+{
+    const auto s_Scene = Globals::Hitman5Module->m_pEntitySceneContext->m_pScene;
+
+    if (!s_Scene) {
+        Logger::Debug("Scene not loaded.");
+        return;
+    }
+
+    constexpr auto s_CrippleBoxFactoryId = ResId<"[modules:/zhm5cripplebox.class].pc_entitytype">;
+
+    TResourcePtr<ZTemplateEntityFactory> s_CrippleBoxFactory;
+    Globals::ResourceManager->GetResourcePtr(s_CrippleBoxFactory, s_CrippleBoxFactoryId, 0);
+
+    if (!s_CrippleBoxFactory) {
+        Logger::Debug("Resource is not loaded.");
+        return;
+    }
+
+    ZEntityRef s_NewCrippleBox;
+
+    Functions::ZEntityManager_NewEntity->Call(
+        Globals::EntityManager, s_NewCrippleBox, "", s_CrippleBoxFactory, s_Scene.m_ref, nullptr, -1
+    );
+
+    if (!s_NewCrippleBox) {
+        Logger::Debug("Failed to spawn entity.");
+        return;
+    }
+
+    hm5CrippleBox = s_NewCrippleBox.QueryInterface<ZHM5CrippleBox>();
 }
 
 void ChaosEvents::HandleKillAura()
@@ -146,9 +184,59 @@ void ChaosEvents::HandleRemoveAllWeapons()
 void ChaosEvents::HandleInfiniteAmmo()
 {
     Logger::Debug("HandleInfiniteAmmo");
+
+    auto it = activeEffects.find(EChaosEvent::InfiniteAmmo);
+    if (it != activeEffects.end()) {
+        if (it->second.justStarted && !hm5CrippleBox)
+        {
+            CreateCrippleBox();
+        }
+        if (it->second.justStarted && hm5CrippleBox)
+        {
+            auto s_LocalHitman = SDK()->GetLocalPlayer();
+
+            if (!s_LocalHitman) {
+                Logger::Debug("Local player is not alive.");
+                return;
+            }
+
+            hm5CrippleBox->m_bActivateOnStart = true;
+            hm5CrippleBox->m_rHitmanCharacter = s_LocalHitman;
+            hm5CrippleBox->m_bLimitedAmmo = false;
+            hm5CrippleBox->Activate(0);
+        }
+        else if (it->second.effectDuration <= 1 && hm5CrippleBox)
+        {
+            hm5CrippleBox->m_bLimitedAmmo = true;
+            hm5CrippleBox->Deactivate(0);
+        }
+    }
 }
 
 void ChaosEvents::HandleMakeAllNPCsInvisible()
 {
     Logger::Debug("HandleMakeAllNPCsInvisible");
+}
+
+void ChaosEvents::HandleMake47Invincible()
+{
+    Logger::Debug("HandleMake47Invincible");
+
+    auto player = SDK()->GetLocalPlayer();
+    const auto playerPos = SDK()->GetLocalPlayer().m_ref.QueryInterface<ZHM5HitmanHealthModifier_EHealthValue>();
+
+    if (player.m_pInterfaceRef->m_bIsInvincible == false)
+    {
+        player.m_ref.SetProperty("m_bIsInvincible", true);
+    }
+
+    auto it = activeEffects.find(EChaosEvent::Make47Invincible);
+    if (it != activeEffects.end()) {
+        if (it->second.effectDuration <= 1)
+        {
+            player.m_ref.SetProperty("m_bIsInvincible", false);
+            return;
+        }
+    }
+    
 }

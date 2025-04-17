@@ -2,6 +2,7 @@
 
 #include <IPluginInterface.h>
 
+#include <Glacier/ZHM5CrippleBox.h>
 #include <Glacier/SGameUpdateEvent.h>
 
 class ChaosEvents : public IPluginInterface {
@@ -19,6 +20,7 @@ public:
 		RemoveAllWeapons,
 		InfiniteAmmo,
 		MakeAllNPCsInvisible,
+		Make47Invincible,
 		RandomTeleport,
 		SpawnFireExtinguishers,
 		SpawnRubberDucks,
@@ -27,8 +29,12 @@ public:
 
 	struct ChaosEventData {
 		std::function<void()> effectFunction;
-		int effectDuration;
-		bool isEffectActive;
+		// The duration of the effect: setting equal to 1 should only run the effect one time. Zero is treated like the effect has expired.
+		int effectDuration = 1000;
+		// Call to check if effect is active and running
+		bool isEffectActive = false;
+		// Bool for effects that need something to be ran once
+		bool justStarted = true;
 	};
 
 private:
@@ -41,25 +47,30 @@ private:
 	void HandleRemoveAllWeapons();
 	void HandleInfiniteAmmo();
 	void HandleMakeAllNPCsInvisible();
+	void HandleMake47Invincible();
 
 public:
 	void ExecuteEvent(EChaosEvent event);
 	EChaosEvent GetRandomEvent();
 	void ExecuteRandomEvent();
+	void CreateCrippleBox();
 
 	ChaosEvents() {
 		eventHandlers = {
-			{ EChaosEvent::KillAura, {[this]() { HandleKillAura(); }, 1000, false} },
-			{ EChaosEvent::ReviveAura, {[this]() { HandleReviveAura(); }, 1000, false} },
-			{ EChaosEvent::LoadRandomMap, {[this]() { HandleLoadRandomMap(); }, 1000, false} },
-			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(); }, 1000, false} },
-			{ EChaosEvent::InfiniteAmmo, {[this]() { HandleInfiniteAmmo(); }, 1000, false} },
-			{ EChaosEvent::MakeAllNPCsInvisible, {[this]() { HandleMakeAllNPCsInvisible(); }, 1000, false} }
+			{ EChaosEvent::KillAura, {[this]() { HandleKillAura(); }, 1000} },
+			{ EChaosEvent::ReviveAura, {[this]() { HandleReviveAura(); }, 1000} },
+			{ EChaosEvent::LoadRandomMap, {[this]() { HandleLoadRandomMap(); }, 1} },
+			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(); }, 1000} },
+			{ EChaosEvent::InfiniteAmmo, {[this]() { HandleInfiniteAmmo(); }, 1000} },
+			{ EChaosEvent::MakeAllNPCsInvisible, {[this]() { HandleMakeAllNPCsInvisible(); }, 1000} },
+			{ EChaosEvent::Make47Invincible, {[this]() { HandleMake47Invincible(); }, 1000} }
 		};
 	}
 
 	ZSceneData* m_LastLoadedScene = nullptr;
 	ZEntitySceneContext* m_LastLoadedSceneContext = nullptr;
+
+	ZHM5CrippleBox* hm5CrippleBox = nullptr;
 };
 
 /*

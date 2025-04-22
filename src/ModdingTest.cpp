@@ -49,12 +49,24 @@ void ModdingTest::OnDrawMenu() {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::InfiniteAmmo); }
     }
 
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Spawn Fire Extinguishers")) {
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Extinguishers")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnFireExtinguishers); }
     }
 
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Teleport 47 to Rand Character")) {
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Rand Teleport")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Teleport47ToRandChar); }
+    }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Launch")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LaunchAllChars); }
+    }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Test1")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::DebugSampleFirstEvent); }
+    }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Test2")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::DebugSampleLastEvent); }
     }
 }
 

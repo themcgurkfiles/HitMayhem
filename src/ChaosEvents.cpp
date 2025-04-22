@@ -22,6 +22,7 @@
 #include <Glacier/ZPhysics.h>
 #include <Glacier/ZContentKitManager.h>
 #include <Glacier/ZAction.h>
+#include <Glacier/ZOutfit.h>
 
 #include <random>
 
@@ -312,12 +313,12 @@ void ChaosEvents::HandleMakeAllNPCsInvisible()
 
 void ChaosEvents::HandleMakeAllNPCsEnforcers()
 {
-	Logger::Debug("HandleMakeAllNPCsEnforcers");
+    Logger::Debug("HandleMakeAllNPCsEnforcers");
 }
 
 void ChaosEvents::HandleTeleport47ToRandChar()
 {
-    Logger::Debug("HandleMakeAllNPCsEnforcers");
+    //Logger::Debug("HandleMakeAllNPCsEnforcers");
 
 	int randomIndex = rand() % *Globals::NextActorId;
 
@@ -337,6 +338,37 @@ void ChaosEvents::HandleTeleport47ToRandChar()
     }
 }
 
+void ChaosEvents::HandleLaunchAllChars()
+{
+    //Logger::Debug("HandleLaunchAllChars");
+    for (int i = 0; i < *Globals::NextActorId; i++)
+    {
+        auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
+        ZSpatialEntity* s_SpatialEntity = Globals::ActorManager->m_aActiveActors[i].m_ref.QueryInterface<ZSpatialEntity>();
+        SMatrix s_WorldMatrix = s_SpatialEntity->GetWorldMatrix();
+        s_WorldMatrix.Trans.z += 2.0;
+        s_SpatialEntity->SetWorldMatrix(s_WorldMatrix);
+    }
+}
+
+void ChaosEvents::HandleLookingGood47()
+{
+    //Logger::Debug("HandleLookingGood47");
+    auto s_LocalHitman = SDK()->GetLocalPlayer();
+    ZContentKitManager* s_ContentKitManager = Globals::ContentKitManager;
+    for (auto it = s_ContentKitManager->m_repositoryGlobalOutfitKits.begin(); it != s_ContentKitManager->m_repositoryGlobalOutfitKits.end(); ++it)
+    {
+        Functions::ZHitman5_SetOutfit->Call(
+            s_LocalHitman.m_pInterfaceRef,
+            it->second,
+            0,
+            1,
+            false,
+            false
+        );
+    }
+}
+
 void ChaosEvents::HandleTeleportAllCharsTo47()
 {
     Logger::Debug("HandleTeleportAllCharsTo47");
@@ -345,4 +377,14 @@ void ChaosEvents::HandleTeleportAllCharsTo47()
 void ChaosEvents::HandleTeleportTargetsToRandomChar()
 {
     Logger::Debug("TeleportTargetsToRandomChar");
+}
+
+void ChaosEvents::HandleTestEvent1()
+{
+	Logger::Debug("HandleTestEvent1");
+}
+
+void ChaosEvents::HandleTestEvent2()
+{
+	Logger::Debug("HandleTestEvent2");
 }

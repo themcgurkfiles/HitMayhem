@@ -28,6 +28,8 @@ public:
 		SpawnFireExtinguishers,
 
 		Teleport47ToRandChar,
+		LaunchAllChars,
+		LookingGood47,
 		TeleportAllCharsTo47,
 		TeleportTargetsToRandomChar,
 		//SpawnRubberDucks,
@@ -51,20 +53,26 @@ private:
 	std::unordered_map<EChaosEvent, ChaosEventData> eventHandlers;
 	std::unordered_map<EChaosEvent, ChaosEventData> activeEffects;
 	EChaosEvent m_CurrentEvent = EChaosEvent::DebugSampleFirstEvent;
+
 	void HandleKillAura();
 	void HandleReviveAura();
 	void HandleInfiniteAmmo();
 	void HandleMake47Invincible();
-	void HandleSpawnFireExtinguishers();
 
+	void HandleSpawnFireExtinguishers();
 	void HandleRemoveAllWeapons();
 	void HandleMakeAllNPCsInvisible();
 	void HandleMakeAllNPCsEnforcers();
 
 	void HandleTeleport47ToRandChar();
+	void HandleLaunchAllChars();
+	void HandleLookingGood47();
 	void HandleTeleportAllCharsTo47();
 	void HandleTeleportTargetsToRandomChar();
-	
+
+	// For testing:
+	void HandleTestEvent1();
+	void HandleTestEvent2();
 
 public:
 	void ExecuteEvent(EChaosEvent event);
@@ -85,8 +93,13 @@ public:
 			{ EChaosEvent::MakeAllNPCsEnforcers, {[this]() { HandleMakeAllNPCsEnforcers(); }, 1000} },
 
 			{ EChaosEvent::Teleport47ToRandChar, {[this]() { HandleTeleport47ToRandChar(); }, 1}},
+			{ EChaosEvent::LaunchAllChars, {[this]() { HandleLaunchAllChars(); }, 1}},
+			{ EChaosEvent::LookingGood47, {[this]() { HandleLookingGood47(); }, 1}},
 			{ EChaosEvent::TeleportAllCharsTo47, {[this]() { HandleTeleportAllCharsTo47(); }, 1}},
-			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(); }, 1}}
+			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(); }, 1}},
+
+			{ EChaosEvent::DebugSampleFirstEvent, {[this]() { HandleTestEvent1(); }, 1} },
+			{ EChaosEvent::DebugSampleLastEvent, {[this]() { HandleTestEvent2(); }, 1} }
 		};
 	}
 

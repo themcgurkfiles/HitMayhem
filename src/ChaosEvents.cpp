@@ -218,8 +218,71 @@ void ChaosEvents::HandleMake47Invincible()
 
 }
 
+void ChaosEvents::HandleSpawnFireExtinguishers()
+{
+    // WIP: HASH NOT WORKING FOR SOME REASON
+    auto it = activeEffects.find(EChaosEvent::SpawnFireExtinguishers);
+    if (it != activeEffects.end()) {
+        if (it->second.justStarted)
+        {
+            const auto s_Scene = Globals::Hitman5Module->m_pEntitySceneContext->m_pScene;
+
+            if (!s_Scene) {
+                Logger::Debug("Scene not loaded.");
+                return;
+            }
+
+            const Hash::MD5Hash s_Hash = Hash::MD5("00989EB5E366C892");
+
+            const uint32_t s_IdHigh = ((s_Hash.A >> 24) & 0x000000FF)
+                | ((s_Hash.A >> 8) & 0x0000FF00)
+                | ((s_Hash.A << 8) & 0x00FF0000);
+
+            const uint32_t s_IdLow = ((s_Hash.B >> 24) & 0x000000FF)
+                | ((s_Hash.B >> 8) & 0x0000FF00)
+                | ((s_Hash.B << 8) & 0x00FF0000)
+                | ((s_Hash.B << 24) & 0xFF000000);
+
+            const auto s_RuntimeResourceId = ZRuntimeResourceID(s_IdHigh, s_IdLow);
+
+            TResourcePtr<ZTemplateEntityFactory> s_Resource;
+            Globals::ResourceManager->GetResourcePtr(s_Resource, s_RuntimeResourceId, 0);
+
+            if (!s_Resource) {
+                Logger::Debug("Resource is not loaded.");
+                return;
+            }
+
+            ZEntityRef s_NewEntity;
+            Functions::ZEntityManager_NewEntity->Call(
+                Globals::EntityManager, s_NewEntity, "", s_Resource, s_Scene.m_ref, nullptr, -1
+            );
+
+            if (!s_NewEntity) {
+                Logger::Debug("Failed to spawn entity.");
+                return;
+            }
+
+            s_NewEntity.SetProperty("m_eRoomBehaviour", ZSpatialEntity::ERoomBehaviour::ROOM_DYNAMIC);
+
+            auto s_LocalHitman = SDK()->GetLocalPlayer();
+
+            if (!s_LocalHitman) {
+                Logger::Debug("No local hitman.");
+                return;
+            }
+
+            const auto s_HitmanSpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
+            const auto s_PropSpatialEntity = s_NewEntity.QueryInterface<ZSpatialEntity>();
+
+            s_PropSpatialEntity->SetWorldMatrix(s_HitmanSpatialEntity->GetWorldMatrix());
+        }
+    }
+}
+
 void ChaosEvents::HandleRemoveAllWeapons()
 {
+    // WIP: NOT CURRENTLY WORKING
     Logger::Debug("HandleRemoveAllWeapons");
 
     auto s_LocalHitman = SDK()->GetLocalPlayer();
@@ -250,4 +313,36 @@ void ChaosEvents::HandleMakeAllNPCsInvisible()
 void ChaosEvents::HandleMakeAllNPCsEnforcers()
 {
 	Logger::Debug("HandleMakeAllNPCsEnforcers");
+}
+
+void ChaosEvents::HandleTeleport47ToRandChar()
+{
+    Logger::Debug("HandleMakeAllNPCsEnforcers");
+
+	int randomIndex = rand() % *Globals::NextActorId;
+
+    for (int i = 0; i < *Globals::NextActorId; i++)
+    {
+        auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
+        auto actorPos = Globals::ActorManager->m_aActiveActors[i].m_ref.QueryInterface<ZSpatialEntity>()->GetWorldMatrix().Trans;
+
+        if (i == randomIndex) {
+            if (auto s_LocalHitman = SDK()->GetLocalPlayer()) {
+                ZSpatialEntity* s_SpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
+                SMatrix s_WorldMatrix = s_SpatialEntity->GetWorldMatrix();
+                s_WorldMatrix.Trans = actorPos;
+                s_SpatialEntity->SetWorldMatrix(s_WorldMatrix);
+            }
+        }
+    }
+}
+
+void ChaosEvents::HandleTeleportAllCharsTo47()
+{
+    Logger::Debug("HandleTeleportAllCharsTo47");
+}
+
+void ChaosEvents::HandleTeleportTargetsToRandomChar()
+{
+    Logger::Debug("TeleportTargetsToRandomChar");
 }

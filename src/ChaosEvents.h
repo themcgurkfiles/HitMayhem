@@ -25,7 +25,11 @@ public:
 		RemoveAllWeapons,
 		MakeAllNPCsInvisible,
 		MakeAllNPCsEnforcers,
-		//SpawnFireExtinguishers,
+		SpawnFireExtinguishers,
+
+		Teleport47ToRandChar,
+		TeleportAllCharsTo47,
+		TeleportTargetsToRandomChar,
 		//SpawnRubberDucks,
 		//SpawnRandomExplosions,
 		//RandomTeleport,
@@ -51,10 +55,15 @@ private:
 	void HandleReviveAura();
 	void HandleInfiniteAmmo();
 	void HandleMake47Invincible();
+	void HandleSpawnFireExtinguishers();
 
 	void HandleRemoveAllWeapons();
 	void HandleMakeAllNPCsInvisible();
 	void HandleMakeAllNPCsEnforcers();
+
+	void HandleTeleport47ToRandChar();
+	void HandleTeleportAllCharsTo47();
+	void HandleTeleportTargetsToRandomChar();
 	
 
 public:
@@ -65,14 +74,19 @@ public:
 
 	ChaosEvents() {
 		eventHandlers = {
-			{ EChaosEvent::KillAura, {[this]() { HandleKillAura(); }, 10000} },
-			{ EChaosEvent::ReviveAura, {[this]() { HandleReviveAura(); }, 10000} },
-			{ EChaosEvent::InfiniteAmmo, {[this]() { HandleInfiniteAmmo(); }, 10000} },
-			{ EChaosEvent::Make47Invincible, {[this]() { HandleMake47Invincible(); }, 10000} },
+			{ EChaosEvent::KillAura, {[this]() { HandleKillAura(); }, 1000} },
+			{ EChaosEvent::ReviveAura, {[this]() { HandleReviveAura(); }, 1000} },
+			{ EChaosEvent::InfiniteAmmo, {[this]() { HandleInfiniteAmmo(); }, 1000} },
+			{ EChaosEvent::Make47Invincible, {[this]() { HandleMake47Invincible(); }, 1000} },
 
+			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(); }, 1} },
 			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(); }, 1} },
 			{ EChaosEvent::MakeAllNPCsInvisible, {[this]() { HandleMakeAllNPCsInvisible(); }, 1000} },
-			{ EChaosEvent::MakeAllNPCsEnforcers, {[this]() { HandleMakeAllNPCsEnforcers(); }, 1000} }
+			{ EChaosEvent::MakeAllNPCsEnforcers, {[this]() { HandleMakeAllNPCsEnforcers(); }, 1000} },
+
+			{ EChaosEvent::Teleport47ToRandChar, {[this]() { HandleTeleport47ToRandChar(); }, 1}},
+			{ EChaosEvent::TeleportAllCharsTo47, {[this]() { HandleTeleportAllCharsTo47(); }, 1}},
+			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(); }, 1}}
 		};
 	}
 

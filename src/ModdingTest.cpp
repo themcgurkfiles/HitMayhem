@@ -48,6 +48,14 @@ void ModdingTest::OnDrawMenu() {
     if (ImGui::Button(ICON_MD_LOCK_RESET "Infinite Ammo")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::InfiniteAmmo); }
     }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Spawn Fire Extinguishers")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnFireExtinguishers); }
+    }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Teleport 47 to Rand Character")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Teleport47ToRandChar); }
+    }
 }
 
 void ModdingTest::OnDrawUI(bool p_HasFocus) {

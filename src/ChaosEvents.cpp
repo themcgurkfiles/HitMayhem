@@ -121,9 +121,8 @@ void ChaosEvents::CreateCrippleBox()
 
 void ChaosEvents::HandleKillAura()
 {
-    //Logger::Debug("HandleKillAura");
+    Logger::Debug("HandleKillAura");
     const auto playerPos = SDK()->GetLocalPlayer().m_ref.QueryInterface<ZSpatialEntity>()->GetWorldMatrix().Trans;
-
     for (int i = 0; i < *Globals::NextActorId; i++)
     {
         auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
@@ -145,9 +144,8 @@ void ChaosEvents::HandleKillAura()
 
 void ChaosEvents::HandleReviveAura()
 {
-    //Logger::Debug("HandleReviveAura");
+    Logger::Debug("HandleReviveAura");
     const auto playerPos = SDK()->GetLocalPlayer().m_ref.QueryInterface<ZSpatialEntity>()->GetWorldMatrix().Trans;
-
     for (int i = 0; i < *Globals::NextActorId; i++)
     {
         auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
@@ -167,8 +165,7 @@ void ChaosEvents::HandleReviveAura()
 
 void ChaosEvents::HandleInfiniteAmmo()
 {
-    //Logger::Debug("HandleInfiniteAmmo");
-
+    Logger::Debug("HandleInfiniteAmmo");
     auto it = activeEffects.find(EChaosEvent::InfiniteAmmo);
     if (it != activeEffects.end()) {
         if (it->second.justStarted && !hm5CrippleBox)
@@ -199,15 +196,12 @@ void ChaosEvents::HandleInfiniteAmmo()
 
 void ChaosEvents::HandleMake47Invincible()
 {
-    //Logger::Debug("HandleMake47Invincible");
-
+    Logger::Debug("HandleMake47Invincible");
     auto player = SDK()->GetLocalPlayer();
-
     if (player.m_pInterfaceRef->m_bIsInvincible == false)
     {
         player.m_ref.SetProperty("m_bIsInvincible", true);
     }
-
     auto it = activeEffects.find(EChaosEvent::Make47Invincible);
     if (it != activeEffects.end()) {
         if (it->second.effectDuration <= 1)
@@ -222,6 +216,7 @@ void ChaosEvents::HandleMake47Invincible()
 void ChaosEvents::HandleSpawnFireExtinguishers()
 {
     // WIP: HASH NOT WORKING FOR SOME REASON
+    Logger::Debug("HandleSpawnFireExtinguishers");
     auto it = activeEffects.find(EChaosEvent::SpawnFireExtinguishers);
     if (it != activeEffects.end()) {
         if (it->second.justStarted)
@@ -318,10 +313,8 @@ void ChaosEvents::HandleMakeAllNPCsEnforcers()
 
 void ChaosEvents::HandleTeleport47ToRandChar()
 {
-    //Logger::Debug("HandleMakeAllNPCsEnforcers");
-
+    Logger::Debug("HandleMakeAllNPCsEnforcers");
 	int randomIndex = rand() % *Globals::NextActorId;
-
     for (int i = 0; i < *Globals::NextActorId; i++)
     {
         auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
@@ -340,7 +333,7 @@ void ChaosEvents::HandleTeleport47ToRandChar()
 
 void ChaosEvents::HandleLaunchAllChars()
 {
-    //Logger::Debug("HandleLaunchAllChars");
+    Logger::Debug("HandleLaunchAllChars");
     for (int i = 0; i < *Globals::NextActorId; i++)
     {
         auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
@@ -353,11 +346,14 @@ void ChaosEvents::HandleLaunchAllChars()
 
 void ChaosEvents::HandleLookingGood47()
 {
-    //Logger::Debug("HandleLookingGood47");
+    Logger::Debug("HandleLookingGood47");
     auto s_LocalHitman = SDK()->GetLocalPlayer();
     ZContentKitManager* s_ContentKitManager = Globals::ContentKitManager;
+    int i = 0;
+	int randomIndex = rand() % s_ContentKitManager->m_repositoryGlobalOutfitKits.size();
     for (auto it = s_ContentKitManager->m_repositoryGlobalOutfitKits.begin(); it != s_ContentKitManager->m_repositoryGlobalOutfitKits.end(); ++it)
     {
+		Logger::Debug("Outfit: {}", (it->second.m_pInterfaceRef->m_sTitle));
         Functions::ZHitman5_SetOutfit->Call(
             s_LocalHitman.m_pInterfaceRef,
             it->second,
@@ -366,6 +362,10 @@ void ChaosEvents::HandleLookingGood47()
             false,
             false
         );
+
+		if (i == randomIndex)
+            return;
+        i++;
     }
 }
 

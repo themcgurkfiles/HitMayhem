@@ -57,8 +57,12 @@ void ModdingTest::OnDrawMenu() {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Teleport47ToRandChar); }
     }
 
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Launch")) {
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Launch NPC")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LaunchAllChars); }
+    }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Launch 47")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Launch47); }
     }
 
     if (ImGui::Button(ICON_MD_LOCK_RESET "LookingGood")) {

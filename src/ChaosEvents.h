@@ -25,6 +25,7 @@ public:
 		SpawnFireExtinguishers,
 		Teleport47ToRandChar,
 		LaunchAllChars,
+		Launch47,
 		LookingGood47,
 		TeleportAllCharsTo47,
 		TeleportTargetsToRandomChar,
@@ -60,6 +61,7 @@ private:
 	void HandleMakeAllNPCsEnforcers();
 	void HandleTeleport47ToRandChar();
 	void HandleLaunchAllChars();
+	void HandleLaunch47();
 	void HandleLookingGood47();
 	void HandleTeleportAllCharsTo47();
 	void HandleTeleportTargetsToRandomChar();
@@ -79,6 +81,7 @@ public:
 			{ EChaosEvent::Make47Invincible, {[this]() { HandleMake47Invincible(); }, 1000} },
 			{ EChaosEvent::Teleport47ToRandChar, {[this]() { HandleTeleport47ToRandChar(); }, 1}},
 			{ EChaosEvent::LaunchAllChars, {[this]() { HandleLaunchAllChars(); }, 1}},
+			{ EChaosEvent::Launch47, {[this]() { HandleLaunch47(); }, 1}},
 			{ EChaosEvent::LookingGood47, {[this]() { HandleLookingGood47(); }, 1}},
 
 			// Work-in-progress effects, ordered from when I started working on them

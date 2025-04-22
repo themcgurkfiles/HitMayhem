@@ -339,8 +339,40 @@ void ChaosEvents::HandleLaunchAllChars()
         auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
         ZSpatialEntity* s_SpatialEntity = Globals::ActorManager->m_aActiveActors[i].m_ref.QueryInterface<ZSpatialEntity>();
         SMatrix s_WorldMatrix = s_SpatialEntity->GetWorldMatrix();
-        s_WorldMatrix.Trans.z += 2.0;
-        s_SpatialEntity->SetWorldMatrix(s_WorldMatrix);
+        //s_WorldMatrix.Trans.z += 2.0;
+        //s_SpatialEntity->SetWorldMatrix(s_WorldMatrix);
+
+        // TODO: Fix ragdolls
+		//Functions::ZHM5BaseCharacter_ActivateRagdoll->Call(
+        //    actor, true
+		//);
+
+		Functions::ZHM5BaseCharacter_ActivatePoweredRagdoll->Call(
+			actor, 0.3f, true, false, 0.15f, false
+		);
+
+        auto* ragdoller = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef->m_pRagdollHandler;
+        if (ragdoller)
+        {
+            Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
+                ragdoller, float4(0, 0, 0, 0), float4(0, 0, 800, 1), i, false
+            );
+        }
+    }
+}
+
+void ChaosEvents::HandleLaunch47()
+{
+    Functions::ZHM5BaseCharacter_ActivatePoweredRagdoll->Call(
+        SDK()->GetLocalPlayer().m_pInterfaceRef, 0.3f, true, false, 0.15f, false
+    );
+
+    auto* localRagdoller = SDK()->GetLocalPlayer().m_pInterfaceRef->m_pRagdollHandler;
+    if (localRagdoller)
+    {
+        Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
+            localRagdoller, float4(0, 0, 0, 0), float4(0, 0, 1600, 1), 1, false
+        );
     }
 }
 

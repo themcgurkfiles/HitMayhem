@@ -61,12 +61,8 @@ void ModdingTest::OnDrawMenu() {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LaunchAllChars); }
     }
 
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Test1")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::DebugSampleFirstEvent); }
-    }
-
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Test2")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::DebugSampleLastEvent); }
+    if (ImGui::Button(ICON_MD_LOCK_RESET "LookingGood")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LookingGood47); }
     }
 }
 

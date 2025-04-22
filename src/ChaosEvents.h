@@ -15,18 +15,14 @@ public:
 	enum class EChaosEvent { 
 		DebugSampleFirstEvent, // Do not assign
 
-		// All working effects:
 		KillAura,
 		ReviveAura,
 		InfiniteAmmo,
 		Make47Invincible,
-
-		// TODO Effects: As of now, don't work
 		RemoveAllWeapons,
 		MakeAllNPCsInvisible,
 		MakeAllNPCsEnforcers,
 		SpawnFireExtinguishers,
-
 		Teleport47ToRandChar,
 		LaunchAllChars,
 		LookingGood47,
@@ -58,21 +54,15 @@ private:
 	void HandleReviveAura();
 	void HandleInfiniteAmmo();
 	void HandleMake47Invincible();
-
 	void HandleSpawnFireExtinguishers();
 	void HandleRemoveAllWeapons();
 	void HandleMakeAllNPCsInvisible();
 	void HandleMakeAllNPCsEnforcers();
-
 	void HandleTeleport47ToRandChar();
 	void HandleLaunchAllChars();
 	void HandleLookingGood47();
 	void HandleTeleportAllCharsTo47();
 	void HandleTeleportTargetsToRandomChar();
-
-	// For testing:
-	void HandleTestEvent1();
-	void HandleTestEvent2();
 
 public:
 	void ExecuteEvent(EChaosEvent event);
@@ -82,24 +72,22 @@ public:
 
 	ChaosEvents() {
 		eventHandlers = {
+			// Working effects, ordered from when I got them to work
 			{ EChaosEvent::KillAura, {[this]() { HandleKillAura(); }, 1000} },
 			{ EChaosEvent::ReviveAura, {[this]() { HandleReviveAura(); }, 1000} },
 			{ EChaosEvent::InfiniteAmmo, {[this]() { HandleInfiniteAmmo(); }, 1000} },
 			{ EChaosEvent::Make47Invincible, {[this]() { HandleMake47Invincible(); }, 1000} },
+			{ EChaosEvent::Teleport47ToRandChar, {[this]() { HandleTeleport47ToRandChar(); }, 1}},
+			{ EChaosEvent::LaunchAllChars, {[this]() { HandleLaunchAllChars(); }, 1}},
+			{ EChaosEvent::LookingGood47, {[this]() { HandleLookingGood47(); }, 1}},
 
+			// Work-in-progress effects, ordered from when I started working on them
 			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(); }, 1} },
 			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(); }, 1} },
 			{ EChaosEvent::MakeAllNPCsInvisible, {[this]() { HandleMakeAllNPCsInvisible(); }, 1000} },
 			{ EChaosEvent::MakeAllNPCsEnforcers, {[this]() { HandleMakeAllNPCsEnforcers(); }, 1000} },
-
-			{ EChaosEvent::Teleport47ToRandChar, {[this]() { HandleTeleport47ToRandChar(); }, 1}},
-			{ EChaosEvent::LaunchAllChars, {[this]() { HandleLaunchAllChars(); }, 1}},
-			{ EChaosEvent::LookingGood47, {[this]() { HandleLookingGood47(); }, 1}},
 			{ EChaosEvent::TeleportAllCharsTo47, {[this]() { HandleTeleportAllCharsTo47(); }, 1}},
 			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(); }, 1}},
-
-			{ EChaosEvent::DebugSampleFirstEvent, {[this]() { HandleTestEvent1(); }, 1} },
-			{ EChaosEvent::DebugSampleLastEvent, {[this]() { HandleTestEvent2(); }, 1} }
 		};
 	}
 

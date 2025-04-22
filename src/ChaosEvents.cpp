@@ -378,13 +378,3 @@ void ChaosEvents::HandleTeleportTargetsToRandomChar()
 {
     Logger::Debug("TeleportTargetsToRandomChar");
 }
-
-void ChaosEvents::HandleTestEvent1()
-{
-	Logger::Debug("HandleTestEvent1");
-}
-
-void ChaosEvents::HandleTestEvent2()
-{
-	Logger::Debug("HandleTestEvent2");
-}

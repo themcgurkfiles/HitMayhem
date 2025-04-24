@@ -216,6 +216,7 @@ void ChaosEvents::HandleMake47Invincible()
 void ChaosEvents::HandleSpawnFireExtinguishers()
 {
     // WIP: HASH NOT WORKING FOR SOME REASON
+
     Logger::Debug("HandleSpawnFireExtinguishers");
     auto it = activeEffects.find(EChaosEvent::SpawnFireExtinguishers);
     if (it != activeEffects.end()) {
@@ -339,13 +340,6 @@ void ChaosEvents::HandleLaunchAllChars()
         auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
         ZSpatialEntity* s_SpatialEntity = Globals::ActorManager->m_aActiveActors[i].m_ref.QueryInterface<ZSpatialEntity>();
         SMatrix s_WorldMatrix = s_SpatialEntity->GetWorldMatrix();
-        //s_WorldMatrix.Trans.z += 2.0;
-        //s_SpatialEntity->SetWorldMatrix(s_WorldMatrix);
-
-        // TODO: Fix ragdolls
-		//Functions::ZHM5BaseCharacter_ActivateRagdoll->Call(
-        //    actor, true
-		//);
 
 		Functions::ZHM5BaseCharacter_ActivatePoweredRagdoll->Call(
 			actor, 0.3f, true, false, 0.15f, false
@@ -409,4 +403,15 @@ void ChaosEvents::HandleTeleportAllCharsTo47()
 void ChaosEvents::HandleTeleportTargetsToRandomChar()
 {
     Logger::Debug("TeleportTargetsToRandomChar");
+
+    for (int i = 0; i < *Globals::NextActorId; i++)
+    {
+        auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
+        ZSpatialEntity* s_SpatialEntity = Globals::ActorManager->m_aActiveActors[i].m_ref.QueryInterface<ZSpatialEntity>();
+        SMatrix s_WorldMatrix = s_SpatialEntity->GetWorldMatrix();
+
+        // check if actors are targets:
+        actor->GetType();
+
+    }
 }

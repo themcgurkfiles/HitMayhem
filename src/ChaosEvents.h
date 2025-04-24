@@ -78,6 +78,7 @@ public:
 	std::pair<const std::string, ZRepositoryID> GetRepositoryPropFromIndex(int s_Index);
 	std::pair<const std::string, ZRepositoryID> GetRepositoryPropFromName(std::string itemName);
 	void InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> s_PropPair, ZSpatialEntity* s_SpatialEntity);
+	void InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> s_PropPair, SMatrix& s_PositionMatrix);
 	bool m_Running = false;
 	bool m_ShowMessage = false;
 	bool m_SpawnInWorld = true;

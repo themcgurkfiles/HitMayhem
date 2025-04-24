@@ -243,7 +243,89 @@ std::pair<const std::string, ZRepositoryID> ChaosEvents::GetRepositoryPropFromIn
         ++s_CurrentIndex;
     }
     Logger::Error("repo index out of bounds");
-    throw std::out_of_range("repo index out of bounds.");
+}
+
+std::pair<const std::string, ZRepositoryID> ChaosEvents::GetRepositoryPropFromName(std::string itemName)
+{
+    int s_CurrentIndex = 0;
+    for (auto it = m_RepositoryProps.begin(); it != m_RepositoryProps.end(); ++it) {
+        if (it->first == itemName) {
+            return *it;
+        }
+        ++s_CurrentIndex;
+    }
+    Logger::Error("repo index out of bounds");
+}
+
+void ChaosEvents::InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> s_PropPair, ZSpatialEntity* s_SpatialEntity)
+{
+    auto s_LocalHitman = SDK()->GetLocalPlayer();
+    if (!s_LocalHitman) {
+        Logger::Error("No local hitman.");
+        return;
+    }
+    
+    if (m_SpawnInWorld) {
+        Logger::Info("Spawning in world: {}", s_PropPair.first);
+        
+
+        const auto s_Scene = Globals::Hitman5Module->m_pEntitySceneContext->m_pScene;
+        if (!s_Scene) {
+            Logger::Warn("no scene loaded");
+            return;
+        }
+
+        const auto s_ItemSpawnerID = ResId<"[modules:/zitemspawner.class].pc_entitytype">;
+        const auto s_ItemRepoKeyID = ResId<"[modules:/zitemrepositorykeyentity.class].pc_entitytype">;
+
+        TResourcePtr<ZTemplateEntityFactory> s_Resource, s_Resource2;
+
+        Globals::ResourceManager->GetResourcePtr(s_Resource, s_ItemSpawnerID, 0);
+        Globals::ResourceManager->GetResourcePtr(s_Resource2, s_ItemRepoKeyID, 0);
+
+        if (!s_Resource)
+        {
+            Logger::Error("resource not loaded");
+            return;
+        }
+
+        ZEntityRef s_ItemSpawnerEntity, s_ItemRepoKey;
+
+        Functions::ZEntityManager_NewEntity->Call(Globals::EntityManager, s_ItemSpawnerEntity, "", s_Resource, s_Scene.m_ref, nullptr, -1);
+        Functions::ZEntityManager_NewEntity->Call(Globals::EntityManager, s_ItemRepoKey, "", s_Resource2, s_Scene.m_ref, nullptr, -1);
+
+        if (!s_ItemSpawnerEntity)
+        {
+            Logger::Error("failed to spawn item spawner");
+            return;
+        }
+
+        if (!s_ItemRepoKey)
+        {
+            Logger::Error("failed to spawn item repo key entity");
+            return;
+        }
+
+        const auto s_ItemSpawner = s_ItemSpawnerEntity.QueryInterface<ZItemSpawner>();
+
+        s_ItemSpawner->m_ePhysicsMode = ZItemSpawner::EPhysicsMode::EPM_KINEMATIC;
+        s_ItemSpawner->m_rMainItemKey.m_ref = s_ItemRepoKey;
+        s_ItemSpawner->m_rMainItemKey.m_pInterfaceRef = s_ItemRepoKey.QueryInterface<ZItemRepositoryKeyEntity>();
+        s_ItemSpawner->m_rMainItemKey.m_pInterfaceRef->m_RepositoryId = s_PropPair.second;
+        s_ItemSpawner->m_bUsePlacementAttach = false;
+        s_ItemSpawner->m_eDisposalTypeOverwrite = EDisposalType::DISPOSAL_HIDE;
+        s_ItemSpawner->SetWorldMatrix(s_SpatialEntity->GetWorldMatrix());
+
+        Functions::ZItemSpawner_RequestContentLoad->Call(s_ItemSpawner);
+    }
+    else {
+        Logger::Info("Adding to inventory: {} {}", s_PropPair.first, s_PropPair.second.ToString());
+        const TArray<TEntityRef<ZCharacterSubcontroller>>* s_Controllers = &s_LocalHitman.m_pInterfaceRef->m_pCharacter.m_pInterfaceRef->m_rSubcontrollerContainer.m_pInterfaceRef->m_aReferencedControllers;
+        auto* s_Inventory = static_cast<ZCharacterSubcontrollerInventory*>(s_Controllers->operator[](6).m_pInterfaceRef);
+
+        TArray<ZRepositoryID> s_ModifierIds;
+        Functions::ZCharacterSubcontrollerInventory_AddDynamicItemToInventory->Call(s_Inventory, s_PropPair.second, "", &s_ModifierIds, 2);
+    }
 }
 
 
@@ -341,70 +423,6 @@ void ChaosEvents::HandleMake47Invincible()
         }
     }
 
-}
-
-void ChaosEvents::HandleSpawnFireExtinguishers()
-{
-    // WIP: HASH NOT WORKING FOR SOME REASON
-
-    Logger::Debug("HandleSpawnFireExtinguishers");
-    auto it = activeEffects.find(EChaosEvent::SpawnFireExtinguishers);
-    if (it != activeEffects.end()) {
-        if (it->second.justStarted)
-        {
-            const auto s_Scene = Globals::Hitman5Module->m_pEntitySceneContext->m_pScene;
-
-            if (!s_Scene) {
-                Logger::Debug("Scene not loaded.");
-                return;
-            }
-
-            const Hash::MD5Hash s_Hash = Hash::MD5("00989EB5E366C892");
-
-            const uint32_t s_IdHigh = ((s_Hash.A >> 24) & 0x000000FF)
-                | ((s_Hash.A >> 8) & 0x0000FF00)
-                | ((s_Hash.A << 8) & 0x00FF0000);
-
-            const uint32_t s_IdLow = ((s_Hash.B >> 24) & 0x000000FF)
-                | ((s_Hash.B >> 8) & 0x0000FF00)
-                | ((s_Hash.B << 8) & 0x00FF0000)
-                | ((s_Hash.B << 24) & 0xFF000000);
-
-            const auto s_RuntimeResourceId = ZRuntimeResourceID(s_IdHigh, s_IdLow);
-
-            TResourcePtr<ZTemplateEntityFactory> s_Resource;
-            Globals::ResourceManager->GetResourcePtr(s_Resource, s_RuntimeResourceId, 0);
-
-            if (!s_Resource) {
-                Logger::Debug("Resource is not loaded.");
-                return;
-            }
-
-            ZEntityRef s_NewEntity;
-            Functions::ZEntityManager_NewEntity->Call(
-                Globals::EntityManager, s_NewEntity, "", s_Resource, s_Scene.m_ref, nullptr, -1
-            );
-
-            if (!s_NewEntity) {
-                Logger::Debug("Failed to spawn entity.");
-                return;
-            }
-
-            s_NewEntity.SetProperty("m_eRoomBehaviour", ZSpatialEntity::ERoomBehaviour::ROOM_DYNAMIC);
-
-            auto s_LocalHitman = SDK()->GetLocalPlayer();
-
-            if (!s_LocalHitman) {
-                Logger::Debug("No local hitman.");
-                return;
-            }
-
-            const auto s_HitmanSpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
-            const auto s_PropSpatialEntity = s_NewEntity.QueryInterface<ZSpatialEntity>();
-
-            s_PropSpatialEntity->SetWorldMatrix(s_HitmanSpatialEntity->GetWorldMatrix());
-        }
-    }
 }
 
 void ChaosEvents::HandleRemoveAllWeapons()
@@ -509,18 +527,16 @@ void ChaosEvents::HandleLookingGood47()
 	int randomIndex = rand() % s_ContentKitManager->m_repositoryGlobalOutfitKits.size();
     for (auto it = s_ContentKitManager->m_repositoryGlobalOutfitKits.begin(); it != s_ContentKitManager->m_repositoryGlobalOutfitKits.end(); ++it)
     {
-		Logger::Debug("Outfit: {}", (it->second.m_pInterfaceRef->m_sTitle));
-        Functions::ZHitman5_SetOutfit->Call(
-            s_LocalHitman.m_pInterfaceRef,
-            it->second,
-            0,
-            1,
-            false,
-            false
-        );
-
-		if (i == randomIndex)
+        if (i == randomIndex)
+        {
+            Logger::Debug("Outfit: {}", (it->second.m_pInterfaceRef->m_sTitle));
+            Functions::ZHitman5_SetOutfit->Call(
+                s_LocalHitman.m_pInterfaceRef,
+                it->second, 0, 1, false, false
+            );
             return;
+        }
+
         i++;
     }
 }
@@ -544,72 +560,38 @@ void ChaosEvents::HandleSpawnRandomItem()
         return;
     }
 
-    if (m_SpawnInWorld) {
-        Logger::Info("Spawning in world: {}", s_PropPair.first);
-        ZSpatialEntity* s_HitmanSpatial = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
-
-        const auto s_Scene = Globals::Hitman5Module->m_pEntitySceneContext->m_pScene;
-        if (!s_Scene) {
-            Logger::Warn("no scene loaded");
-            return;
-        }
-
-        const auto s_ItemSpawnerID = ResId<"[modules:/zitemspawner.class].pc_entitytype">;
-        const auto s_ItemRepoKeyID = ResId<"[modules:/zitemrepositorykeyentity.class].pc_entitytype">;
-
-        TResourcePtr<ZTemplateEntityFactory> s_Resource, s_Resource2;
-
-        Globals::ResourceManager->GetResourcePtr(s_Resource, s_ItemSpawnerID, 0);
-        Globals::ResourceManager->GetResourcePtr(s_Resource2, s_ItemRepoKeyID, 0);
-
-        if (!s_Resource)
-        {
-            Logger::Error("resource not loaded");
-            return;
-        }
-
-        ZEntityRef s_ItemSpawnerEntity, s_ItemRepoKey;
-
-        Functions::ZEntityManager_NewEntity->Call(Globals::EntityManager, s_ItemSpawnerEntity, "", s_Resource, s_Scene.m_ref, nullptr, -1);
-        Functions::ZEntityManager_NewEntity->Call(Globals::EntityManager, s_ItemRepoKey, "", s_Resource2, s_Scene.m_ref, nullptr, -1);
-
-        if (!s_ItemSpawnerEntity)
-        {
-            Logger::Error("failed to spawn item spawner");
-            return;
-        }
-
-        if (!s_ItemRepoKey)
-        {
-            Logger::Error("failed to spawn item repo key entity");
-            return;
-        }
-
-        const auto s_ItemSpawner = s_ItemSpawnerEntity.QueryInterface<ZItemSpawner>();
-
-        s_ItemSpawner->m_ePhysicsMode = ZItemSpawner::EPhysicsMode::EPM_KINEMATIC;
-        s_ItemSpawner->m_rMainItemKey.m_ref = s_ItemRepoKey;
-        s_ItemSpawner->m_rMainItemKey.m_pInterfaceRef = s_ItemRepoKey.QueryInterface<ZItemRepositoryKeyEntity>();
-        s_ItemSpawner->m_rMainItemKey.m_pInterfaceRef->m_RepositoryId = s_PropPair.second;
-        s_ItemSpawner->m_bUsePlacementAttach = false;
-        s_ItemSpawner->m_eDisposalTypeOverwrite = EDisposalType::DISPOSAL_HIDE;
-        s_ItemSpawner->SetWorldMatrix(s_HitmanSpatial->GetWorldMatrix());
-
-        Functions::ZItemSpawner_RequestContentLoad->Call(s_ItemSpawner);
-    }
-    else {
-        Logger::Info("Adding to inventory: {} {}", s_PropPair.first, s_PropPair.second.ToString());
-        const TArray<TEntityRef<ZCharacterSubcontroller>>* s_Controllers = &s_LocalHitman.m_pInterfaceRef->m_pCharacter.m_pInterfaceRef->m_rSubcontrollerContainer.m_pInterfaceRef->m_aReferencedControllers;
-        auto* s_Inventory = static_cast<ZCharacterSubcontrollerInventory*>(s_Controllers->operator[](6).m_pInterfaceRef);
-
-        TArray<ZRepositoryID> s_ModifierIds;
-        Functions::ZCharacterSubcontrollerInventory_AddDynamicItemToInventory->Call(s_Inventory, s_PropPair.second, "", &s_ModifierIds, 2);
-    }
+    auto s_SpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
+    SMatrix s_HitmanWorldMatrix = s_SpatialEntity->GetWorldMatrix();
+    s_HitmanWorldMatrix.Trans += float4(0, 0, 0, 0);
+    s_SpatialEntity->SetWorldMatrix(s_HitmanWorldMatrix);
+    InitiateSpawnItem(s_PropPair, s_SpatialEntity);
 }
 
-void ChaosEvents::HandleTeleportAllCharsTo47()
+void ChaosEvents::HandleSpawnFireExtinguishers()
 {
-    Logger::Debug("HandleTeleportAllCharsTo47");
+    if (m_RepositoryProps.size() == 0)
+    {
+        Logger::Info("loading repository props (your game might freeze shortly)");
+        LoadRepositoryProps();
+    }
+    
+    Logger::Debug("HandleSpawnFireExtinguishers");
+    auto s_PropPair = GetRepositoryPropFromName("Fire Extinguisher");
+    if (s_PropPair.second == ZRepositoryID("")) {
+        Logger::Error("Fire Extinguisher not found in repository.");
+        return;
+    }
+    auto s_LocalHitman = SDK()->GetLocalPlayer();
+    if (!s_LocalHitman) {
+        Logger::Error("No local hitman.");
+        return;
+    }
+
+    auto s_SpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
+    SMatrix s_HitmanWorldMatrix = s_SpatialEntity->GetWorldMatrix();
+    s_HitmanWorldMatrix.Trans + float4(0, 0, 0, 0);
+    s_SpatialEntity->SetWorldMatrix(s_HitmanWorldMatrix);
+    InitiateSpawnItem(s_PropPair, s_SpatialEntity);
 }
 
 void ChaosEvents::HandleTeleportTargetsToRandomChar()

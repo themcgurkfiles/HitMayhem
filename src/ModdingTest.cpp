@@ -72,6 +72,10 @@ void ModdingTest::OnDrawMenu() {
 	if (ImGui::Button(ICON_MD_LOCK_RESET "RandItem")) {
 		if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnRandomItem); }
 	}
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "FireExtinguish")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnFireExtinguishers); }
+    }
 }
 
 void ModdingTest::OnDrawUI(bool p_HasFocus) {

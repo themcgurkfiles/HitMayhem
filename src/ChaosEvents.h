@@ -19,20 +19,19 @@ public:
 		ReviveAura,
 		InfiniteAmmo,
 		Make47Invincible,
-		RemoveAllWeapons,
-		MakeAllNPCsInvisible,
-		MakeAllNPCsEnforcers,
-		SpawnFireExtinguishers,
 		Teleport47ToRandChar,
 		LaunchAllChars,
 		Launch47,
 		LookingGood47,
 		SpawnRandomItem,
-		TeleportAllCharsTo47,
+		SpawnFireExtinguishers,
+
+		RemoveAllWeapons,
+		MakeAllNPCsInvisible,
+		MakeAllNPCsEnforcers,
 		TeleportTargetsToRandomChar,
 		//SpawnRubberDucks,
 		//SpawnRandomExplosions,
-		//RandomTeleport,
 
 		DebugSampleLastEvent   // Do not assign
 	};
@@ -65,7 +64,6 @@ private:
 	void HandleLaunch47();
 	void HandleLookingGood47();
 	void HandleSpawnRandomItem();
-	void HandleTeleportAllCharsTo47();
 	void HandleTeleportTargetsToRandomChar();
 
 public:
@@ -79,6 +77,7 @@ public:
 	std::string ConvertDynamicObjectValueTString(const ZDynamicObject& p_DynamicObject);
 	std::pair<const std::string, ZRepositoryID> GetRepositoryPropFromIndex(int s_Index);
 	std::pair<const std::string, ZRepositoryID> GetRepositoryPropFromName(std::string itemName);
+	void InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> s_PropPair, ZSpatialEntity* s_SpatialEntity);
 	bool m_Running = false;
 	bool m_ShowMessage = false;
 	bool m_SpawnInWorld = true;
@@ -104,15 +103,14 @@ public:
 			{ EChaosEvent::LaunchAllChars, {[this]() { HandleLaunchAllChars(); }, 1}},
 			{ EChaosEvent::Launch47, {[this]() { HandleLaunch47(); }, 1}},
 			{ EChaosEvent::LookingGood47, {[this]() { HandleLookingGood47(); }, 1}},
+			{ EChaosEvent::SpawnRandomItem, {[this]() { HandleSpawnRandomItem(); }, 1} },
+			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(); }, 1} },
 
 			// Work-in-progress effects, ordered from when I started working on them
-			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(); }, 1} },
 			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(); }, 1} },
 			{ EChaosEvent::MakeAllNPCsInvisible, {[this]() { HandleMakeAllNPCsInvisible(); }, 1000} },
 			{ EChaosEvent::MakeAllNPCsEnforcers, {[this]() { HandleMakeAllNPCsEnforcers(); }, 1000} },
-			{ EChaosEvent::TeleportAllCharsTo47, {[this]() { HandleTeleportAllCharsTo47(); }, 1}},
-			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(); }, 1}},
-			{ EChaosEvent::SpawnRandomItem, {[this]() { HandleSpawnRandomItem(); }, 1} },
+			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(); }, 1}}
 		};
 	}
 };

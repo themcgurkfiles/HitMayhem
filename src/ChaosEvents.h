@@ -27,6 +27,7 @@ public:
 		LaunchAllChars,
 		Launch47,
 		LookingGood47,
+		SpawnRandomItem,
 		TeleportAllCharsTo47,
 		TeleportTargetsToRandomChar,
 		//SpawnRubberDucks,
@@ -63,6 +64,7 @@ private:
 	void HandleLaunchAllChars();
 	void HandleLaunch47();
 	void HandleLookingGood47();
+	void HandleSpawnRandomItem();
 	void HandleTeleportAllCharsTo47();
 	void HandleTeleportTargetsToRandomChar();
 
@@ -70,7 +72,26 @@ public:
 	void ExecuteEvent(EChaosEvent event);
 	EChaosEvent GetRandomEvent();
 	void ExecuteRandomEvent();
+
+	//--- Stuff that could be moved to a helper file at some point: ---//
 	void CreateCrippleBox();
+	void LoadRepositoryProps(); // Components for Prop Loading
+	std::string ConvertDynamicObjectValueTString(const ZDynamicObject& p_DynamicObject);
+	std::pair<const std::string, ZRepositoryID> GetRepositoryPropFromIndex(int s_Index);
+	std::pair<const std::string, ZRepositoryID> GetRepositoryPropFromName(std::string itemName);
+	bool m_Running = false;
+	bool m_ShowMessage = false;
+	bool m_SpawnInWorld = true;
+	bool m_IncludeItemsWithoutTitle = false;
+	float m_HitmanItemPosition[3] = { 0, 1, 0 };
+	TResourcePtr<ZTemplateEntityFactory> m_RepositoryResource;
+	std::multimap<std::string, ZRepositoryID> m_RepositoryProps;
+
+	ZSceneData* m_LastLoadedScene = nullptr;
+	ZEntitySceneContext* m_LastLoadedSceneContext = nullptr;
+
+	ZHM5CrippleBox* hm5CrippleBox = nullptr;
+	//------------------------------------------------------------------//
 
 	ChaosEvents() {
 		eventHandlers = {
@@ -91,13 +112,9 @@ public:
 			{ EChaosEvent::MakeAllNPCsEnforcers, {[this]() { HandleMakeAllNPCsEnforcers(); }, 1000} },
 			{ EChaosEvent::TeleportAllCharsTo47, {[this]() { HandleTeleportAllCharsTo47(); }, 1}},
 			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(); }, 1}},
+			{ EChaosEvent::SpawnRandomItem, {[this]() { HandleSpawnRandomItem(); }, 1} },
 		};
 	}
-
-	ZSceneData* m_LastLoadedScene = nullptr;
-	ZEntitySceneContext* m_LastLoadedSceneContext = nullptr;
-
-	ZHM5CrippleBox* hm5CrippleBox = nullptr;
 };
 
 /*

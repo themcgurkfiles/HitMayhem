@@ -68,6 +68,10 @@ void ModdingTest::OnDrawMenu() {
     if (ImGui::Button(ICON_MD_LOCK_RESET "LookingGood")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LookingGood47); }
     }
+
+	if (ImGui::Button(ICON_MD_LOCK_RESET "RandItem")) {
+		if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnRandomItem); }
+	}
 }
 
 void ModdingTest::OnDrawUI(bool p_HasFocus) {

@@ -82,7 +82,7 @@ public:
 	bool m_Running = false;
 	bool m_ShowMessage = false;
 	bool m_SpawnInWorld = true;
-	bool m_IncludeItemsWithoutTitle = false;
+	bool m_IncludeItemsWithoutTitle = true;
 	float m_HitmanItemPosition[3] = { 0, 1, 0 };
 	TResourcePtr<ZTemplateEntityFactory> m_RepositoryResource;
 	std::multimap<std::string, ZRepositoryID> m_RepositoryProps;
@@ -101,11 +101,11 @@ public:
 			{ EChaosEvent::InfiniteAmmo, {[this]() { HandleInfiniteAmmo(); }, 1000} },
 			{ EChaosEvent::Make47Invincible, {[this]() { HandleMake47Invincible(); }, 1000} },
 			{ EChaosEvent::Teleport47ToRandChar, {[this]() { HandleTeleport47ToRandChar(); }, 1}},
-			{ EChaosEvent::LaunchAllChars, {[this]() { HandleLaunchAllChars(); }, 1}},
-			{ EChaosEvent::Launch47, {[this]() { HandleLaunch47(); }, 1}},
+			{ EChaosEvent::LaunchAllChars, {[this]() { HandleLaunchAllChars(); }, 100}},
+			{ EChaosEvent::Launch47, {[this]() { HandleLaunch47(); }, 1000}},
 			{ EChaosEvent::LookingGood47, {[this]() { HandleLookingGood47(); }, 1}},
 			{ EChaosEvent::SpawnRandomItem, {[this]() { HandleSpawnRandomItem(); }, 1} },
-			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(); }, 1} },
+			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(); }, 10} },
 
 			// Work-in-progress effects, ordered from when I started working on them
 			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(); }, 1} },

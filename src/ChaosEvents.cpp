@@ -45,7 +45,7 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
             else
             {
                 effect.effectFunction();
-                effect.effectDuration--;
+                effect.effectDuration -= p_UpdateEvent.m_GameTimeDelta.ToSeconds();
                 if (effect.justStarted)
                     effect.justStarted = false;
             }
@@ -307,8 +307,7 @@ void ChaosEvents::InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> 
         }
 
         const auto s_ItemSpawner = s_ItemSpawnerEntity.QueryInterface<ZItemSpawner>();
-
-        s_ItemSpawner->m_ePhysicsMode = ZItemSpawner::EPhysicsMode::EPM_KINEMATIC;
+        s_ItemSpawner->m_ePhysicsMode = ZItemSpawner::EPhysicsMode::EPM_DYNAMIC;
         s_ItemSpawner->m_rMainItemKey.m_ref = s_ItemRepoKey;
         s_ItemSpawner->m_rMainItemKey.m_pInterfaceRef = s_ItemRepoKey.QueryInterface<ZItemRepositoryKeyEntity>();
         s_ItemSpawner->m_rMainItemKey.m_pInterfaceRef->m_RepositoryId = s_PropPair.second;
@@ -554,38 +553,70 @@ void ChaosEvents::HandleTeleport47ToRandChar()
 void ChaosEvents::HandleLaunchAllChars()
 {
     Logger::Debug("HandleLaunchAllChars");
-    for (int i = 0; i < *Globals::NextActorId; i++)
-    {
-        auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
-        ZSpatialEntity* s_SpatialEntity = Globals::ActorManager->m_aActiveActors[i].m_ref.QueryInterface<ZSpatialEntity>();
-        SMatrix s_WorldMatrix = s_SpatialEntity->GetWorldMatrix();
 
-		Functions::ZHM5BaseCharacter_ActivatePoweredRagdoll->Call(
-			actor, 0.3f, true, false, 0.15f, false
-		);
-
-        auto* ragdoller = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef->m_pRagdollHandler;
-        if (ragdoller)
+    auto it = activeEffects.find(EChaosEvent::LaunchAllChars);
+    if (it != activeEffects.end()) {
+        if (it->second.justStarted)
         {
-            Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
-                ragdoller, float4(0, 0, 0, 0), float4(0, 0, 800, 1), i, false
-            );
+            for (int i = 0; i < *Globals::NextActorId; i++)
+            {
+                auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
+                ZSpatialEntity* s_SpatialEntity = Globals::ActorManager->m_aActiveActors[i].m_ref.QueryInterface<ZSpatialEntity>();
+                SMatrix s_WorldMatrix = s_SpatialEntity->GetWorldMatrix();
+
+                Functions::ZHM5BaseCharacter_ActivatePoweredRagdoll->Call(
+                    actor, 0.3f, true, false, 0.15f, false
+                );
+
+                auto* ragdoller = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef->m_pRagdollHandler;
+                if (ragdoller)
+                {
+                    Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
+                        ragdoller, float4(0, 0, 0, 0), float4(0, 0, 800, 1), i, false
+                    );
+                }
+            }
+        }
+
+        else if (it->second.effectDuration <= 1)
+        {
+            for (int i = 0; i < *Globals::NextActorId; i++)
+            {
+                // TODO: fix the npcs not getting up
+                auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
+                const auto s_Animator = actor->m_pAnimatedActor;
+                Functions::ZHM5BaseCharacter_DeactivateRagdoll->Call(actor);
+            }
         }
     }
 }
 
 void ChaosEvents::HandleLaunch47()
 {
-    Functions::ZHM5BaseCharacter_ActivatePoweredRagdoll->Call(
-        SDK()->GetLocalPlayer().m_pInterfaceRef, 0.3f, true, false, 0.15f, false
-    );
+    auto it = activeEffects.find(EChaosEvent::Launch47);
+    if (it != activeEffects.end()) {
+        if (it->second.justStarted)
+        {
+            Functions::ZHM5BaseCharacter_ActivatePoweredRagdoll->Call(
+                SDK()->GetLocalPlayer().m_pInterfaceRef, 0.3f, true, false, 0.15f, false);
 
-    auto* localRagdoller = SDK()->GetLocalPlayer().m_pInterfaceRef->m_pRagdollHandler;
-    if (localRagdoller)
-    {
-        Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
-            localRagdoller, float4(0, 0, 0, 0), float4(0, 0, 1600, 1), 1, false
-        );
+            auto* localRagdoller = SDK()->GetLocalPlayer().m_pInterfaceRef->m_pRagdollHandler;
+            if (localRagdoller)
+            {
+                Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
+                    localRagdoller, float4(0, 0, 0, 0), float4(0, 0, 1600, 1), 1, false);
+            }
+        }
+
+        else if (it->second.effectDuration == 1)
+        {
+            Functions::ZHM5BaseCharacter_DeactivateRagdoll->Call(SDK()->GetLocalPlayer().m_pInterfaceRef);
+            const auto s_Animator = SDK()->GetLocalPlayer().m_pInterfaceRef->m_Animator.QueryInterface<ZHM5Animator>();
+            auto s_Time = 1.f;
+
+            Functions::ZHM5Animator_ActivateRagdollToAnimationBlend->Call(s_Animator, &s_Time);
+
+        }
     }
 }
 

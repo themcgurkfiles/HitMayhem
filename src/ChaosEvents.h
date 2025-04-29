@@ -14,7 +14,7 @@ public:
 	// The debug events may or may not be needed, at least random won't pick them.
 	enum class EChaosEvent { 
 		DebugSampleFirstEvent, // Do not assign
-
+		//
 		KillAura,
 		ReviveAura,
 		InfiniteAmmo,
@@ -25,15 +25,18 @@ public:
 		LookingGood47,
 		SpawnRandomItem,
 		SpawnFireExtinguishers,
+		//
+		DebugSampleLastEvent,   // Do not assign
 
+		// Unused effects for now (work in progress)
 		RemoveAllWeapons,
 		MakeAllNPCsInvisible,
 		MakeAllNPCsEnforcers,
 		TeleportTargetsToRandomChar,
-		//SpawnRubberDucks,
-		//SpawnRandomExplosions,
+		SpawnRubberDucks,
+		SpawnRandomExplosions,
 
-		DebugSampleLastEvent   // Do not assign
+		
 	};
 
 	struct ChaosEventData {
@@ -92,6 +95,8 @@ public:
 
 	ZHM5CrippleBox* hm5CrippleBox = nullptr;
 	//------------------------------------------------------------------//
+
+	float counter = 0.0f;
 
 	ChaosEvents() {
 		eventHandlers = {

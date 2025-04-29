@@ -31,6 +31,23 @@
 
 void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
     // This function is called every frame while the game is in play mode.
+    if (!SDK()->GetLocalPlayer())
+    {
+		if (!activeEffects.empty()) {
+			activeEffects.clear();
+			counter = 0;
+			Logger::Debug("Couldn't find player, clearing effects...");
+		}
+        return;
+    }
+
+    counter += p_UpdateEvent.m_GameTimeDelta.ToSeconds();
+    if (counter >= 30) {
+        ExecuteRandomEvent();
+        counter = 0;
+    }
+
+    //Logger::Debug("Counter: {}", counter);
 
     for (auto it = activeEffects.begin(); it != activeEffects.end(); ) {
         auto& effect = it->second;
@@ -40,14 +57,14 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
                 Logger::Debug("Effect {} has ended.", static_cast<int>(it->first));
                 it = activeEffects.erase(it);  // erase returns a valid next iterator
                 continue;
-            }
-
-            else
-            {
+            } else {
                 effect.effectFunction();
                 effect.effectDuration -= p_UpdateEvent.m_GameTimeDelta.ToSeconds();
                 if (effect.justStarted)
+                {
+                    Logger::Debug("Effect {} has started.", static_cast<int>(it->first));
                     effect.justStarted = false;
+                }
             }
         }
         ++it;
@@ -403,7 +420,7 @@ void ChaosEvents::InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> 
 
 void ChaosEvents::HandleKillAura()
 {
-    Logger::Debug("HandleKillAura");
+    //Logger::Debug("HandleKillAura");
     const auto playerPos = SDK()->GetLocalPlayer().m_ref.QueryInterface<ZSpatialEntity>()->GetWorldMatrix().Trans;
     for (int i = 0; i < *Globals::NextActorId; i++)
     {
@@ -426,7 +443,7 @@ void ChaosEvents::HandleKillAura()
 
 void ChaosEvents::HandleReviveAura()
 {
-    Logger::Debug("HandleReviveAura");
+    //Logger::Debug("HandleReviveAura");
     const auto playerPos = SDK()->GetLocalPlayer().m_ref.QueryInterface<ZSpatialEntity>()->GetWorldMatrix().Trans;
     for (int i = 0; i < *Globals::NextActorId; i++)
     {
@@ -447,7 +464,7 @@ void ChaosEvents::HandleReviveAura()
 
 void ChaosEvents::HandleInfiniteAmmo()
 {
-    Logger::Debug("HandleInfiniteAmmo");
+    //Logger::Debug("HandleInfiniteAmmo");
     auto it = activeEffects.find(EChaosEvent::InfiniteAmmo);
     if (it != activeEffects.end()) {
         if (it->second.justStarted && !hm5CrippleBox)
@@ -478,7 +495,7 @@ void ChaosEvents::HandleInfiniteAmmo()
 
 void ChaosEvents::HandleMake47Invincible()
 {
-    Logger::Debug("HandleMake47Invincible");
+    //Logger::Debug("HandleMake47Invincible");
     auto player = SDK()->GetLocalPlayer();
     if (player.m_pInterfaceRef->m_bIsInvincible == false)
     {
@@ -498,7 +515,7 @@ void ChaosEvents::HandleMake47Invincible()
 void ChaosEvents::HandleRemoveAllWeapons()
 {
     // WIP: NOT CURRENTLY WORKING
-    Logger::Debug("HandleRemoveAllWeapons");
+    //Logger::Debug("HandleRemoveAllWeapons");
 
     auto s_LocalHitman = SDK()->GetLocalPlayer();
 
@@ -532,7 +549,7 @@ void ChaosEvents::HandleMakeAllNPCsEnforcers()
 
 void ChaosEvents::HandleTeleport47ToRandChar()
 {
-    Logger::Debug("HandleMakeAllNPCsEnforcers");
+    //Logger::Debug("HandleMakeAllNPCsEnforcers");
 	int randomIndex = rand() % *Globals::NextActorId;
     for (int i = 0; i < *Globals::NextActorId; i++)
     {
@@ -552,8 +569,7 @@ void ChaosEvents::HandleTeleport47ToRandChar()
 
 void ChaosEvents::HandleLaunchAllChars()
 {
-    Logger::Debug("HandleLaunchAllChars");
-
+    //Logger::Debug("HandleLaunchAllChars");
     auto it = activeEffects.find(EChaosEvent::LaunchAllChars);
     if (it != activeEffects.end()) {
         if (it->second.justStarted)
@@ -561,6 +577,13 @@ void ChaosEvents::HandleLaunchAllChars()
             for (int i = 0; i < *Globals::NextActorId; i++)
             {
                 auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
+
+                if (!actor)
+                {
+                    Logger::Debug("Actor not checking correctly");
+                    return;
+                }
+
                 ZSpatialEntity* s_SpatialEntity = Globals::ActorManager->m_aActiveActors[i].m_ref.QueryInterface<ZSpatialEntity>();
                 SMatrix s_WorldMatrix = s_SpatialEntity->GetWorldMatrix();
 
@@ -568,7 +591,7 @@ void ChaosEvents::HandleLaunchAllChars()
                     actor, 0.3f, true, false, 0.15f, false
                 );
 
-                auto* ragdoller = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef->m_pRagdollHandler;
+                auto* ragdoller = actor->m_pRagdollHandler;
                 if (ragdoller)
                 {
                     Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
@@ -582,10 +605,17 @@ void ChaosEvents::HandleLaunchAllChars()
         {
             for (int i = 0; i < *Globals::NextActorId; i++)
             {
-                // TODO: fix the npcs not getting up
-                auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
-                const auto s_Animator = actor->m_pAnimatedActor;
-                Functions::ZHM5BaseCharacter_DeactivateRagdoll->Call(actor);
+                
+                auto& actor = Globals::ActorManager->m_aActiveActors[i];
+                Functions::ZHM5BaseCharacter_DeactivateRagdoll->Call(actor.m_pInterfaceRef);
+
+                auto* ragdoller = actor.m_pInterfaceRef->m_pRagdollHandler;
+                if (ragdoller)
+                {
+                    Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
+                        ragdoller, float4(0, 0, 0, 0), float4(0, 0, 50, 1), i, false
+                    );
+                }
             }
         }
     }
@@ -608,21 +638,19 @@ void ChaosEvents::HandleLaunch47()
             }
         }
 
-        else if (it->second.effectDuration == 1)
+        else if (it->second.effectDuration <= 1)
         {
             Functions::ZHM5BaseCharacter_DeactivateRagdoll->Call(SDK()->GetLocalPlayer().m_pInterfaceRef);
             const auto s_Animator = SDK()->GetLocalPlayer().m_pInterfaceRef->m_Animator.QueryInterface<ZHM5Animator>();
             auto s_Time = 1.f;
-
             Functions::ZHM5Animator_ActivateRagdollToAnimationBlend->Call(s_Animator, &s_Time);
-
         }
     }
 }
 
 void ChaosEvents::HandleLookingGood47()
 {
-    Logger::Debug("HandleLookingGood47");
+    //Logger::Debug("HandleLookingGood47");
     auto s_LocalHitman = SDK()->GetLocalPlayer();
     ZContentKitManager* s_ContentKitManager = Globals::ContentKitManager;
     int i = 0;
@@ -648,7 +676,6 @@ void ChaosEvents::HandleSpawnRandomItem()
 {
     if (m_RepositoryProps.size() == 0)
     {
-        Logger::Info("loading repository props (your game might freeze shortly)");
         LoadRepositoryProps();
     }
 
@@ -673,11 +700,10 @@ void ChaosEvents::HandleSpawnFireExtinguishers()
 {
     if (m_RepositoryProps.size() == 0)
     {
-        Logger::Info("loading repository props (your game might freeze shortly)");
         LoadRepositoryProps();
     }
     
-    Logger::Debug("HandleSpawnFireExtinguishers");
+    //Logger::Debug("HandleSpawnFireExtinguishers");
     auto s_PropPair = GetRepositoryPropFromName("Fire Extinguisher");
     if (s_PropPair.second == ZRepositoryID("")) {
         Logger::Error("Fire Extinguisher not found in repository.");
@@ -697,7 +723,7 @@ void ChaosEvents::HandleSpawnFireExtinguishers()
 
 void ChaosEvents::HandleTeleportTargetsToRandomChar()
 {
-    Logger::Debug("TeleportTargetsToRandomChar");
+    //Logger::Debug("TeleportTargetsToRandomChar");
 
     for (int i = 0; i < *Globals::NextActorId; i++)
     {

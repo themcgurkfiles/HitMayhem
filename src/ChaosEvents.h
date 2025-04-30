@@ -20,7 +20,6 @@ public:
 		InfiniteAmmo,
 		Make47Invincible,
 		Teleport47ToRandChar,
-		LaunchAllChars,
 		Launch47,
 		LookingGood47,
 		SpawnRandomItem,
@@ -29,18 +28,18 @@ public:
 		DebugSampleLastEvent,   // Do not assign
 
 		// Unused effects for now (work in progress)
+		LaunchAllChars, // TODO: FIX THIS EFFECT, IT WORKS BUT THE NPCS DON'T EVER GET UP!
 		RemoveAllWeapons,
 		MakeAllNPCsInvisible,
 		MakeAllNPCsEnforcers,
 		TeleportTargetsToRandomChar,
 		SpawnRubberDucks,
 		SpawnRandomExplosions,
-
-		
 	};
 
 	struct ChaosEventData {
 		std::function<void()> effectFunction;
+		std::string effectName = "DEFAULTNAME PLEASE CHANGE";
 		// The duration of the effect: setting equal to 1 should only run the effect one time. Zero is treated like the effect has expired.
 		int effectDuration = 1000;
 		// Call to check if effect is active and running
@@ -101,22 +100,22 @@ public:
 	ChaosEvents() {
 		eventHandlers = {
 			// Working effects, ordered from when I got them to work
-			{ EChaosEvent::KillAura, {[this]() { HandleKillAura(); }, 1000} },
-			{ EChaosEvent::ReviveAura, {[this]() { HandleReviveAura(); }, 1000} },
-			{ EChaosEvent::InfiniteAmmo, {[this]() { HandleInfiniteAmmo(); }, 1000} },
-			{ EChaosEvent::Make47Invincible, {[this]() { HandleMake47Invincible(); }, 1000} },
-			{ EChaosEvent::Teleport47ToRandChar, {[this]() { HandleTeleport47ToRandChar(); }, 1}},
-			{ EChaosEvent::LaunchAllChars, {[this]() { HandleLaunchAllChars(); }, 100}},
-			{ EChaosEvent::Launch47, {[this]() { HandleLaunch47(); }, 1000}},
-			{ EChaosEvent::LookingGood47, {[this]() { HandleLookingGood47(); }, 1}},
-			{ EChaosEvent::SpawnRandomItem, {[this]() { HandleSpawnRandomItem(); }, 1} },
-			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(); }, 10} },
-
+			{ EChaosEvent::KillAura,               {[this]() { HandleKillAura(); }, "Kill Aura", 4000}},
+			{ EChaosEvent::ReviveAura,             {[this]() { HandleReviveAura(); }, "Revive Aura", 4000} },
+			{ EChaosEvent::InfiniteAmmo,           {[this]() { HandleInfiniteAmmo(); }, "Infinite Ammo", 4000} },
+			{ EChaosEvent::Make47Invincible,       {[this]() { HandleMake47Invincible(); }, "GODMODE!!!", 4000} },
+			{ EChaosEvent::Teleport47ToRandChar,   {[this]() { HandleTeleport47ToRandChar(); }, "Teleport to Random NPC", 1}},
+			{ EChaosEvent::LaunchAllChars,         {[this]() { HandleLaunchAllChars(); }, "Launch all NPCs", 100}},
+			{ EChaosEvent::Launch47,               {[this]() { HandleLaunch47(); }, "To The Moon, 47!", 1000}},
+			{ EChaosEvent::LookingGood47,          {[this]() { HandleLookingGood47(); }, "Looking Good, 47!", 1}},
+			{ EChaosEvent::SpawnRandomItem,		   {[this]() { HandleSpawnRandomItem(); }, "Spawn Random Item", 1} },
+			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(); }, "Fire Extinguisher Nuke", 10} },
+			
 			// Work-in-progress effects, ordered from when I started working on them
-			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(); }, 1} },
-			{ EChaosEvent::MakeAllNPCsInvisible, {[this]() { HandleMakeAllNPCsInvisible(); }, 1000} },
-			{ EChaosEvent::MakeAllNPCsEnforcers, {[this]() { HandleMakeAllNPCsEnforcers(); }, 1000} },
-			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(); }, 1}}
+			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(); }, "Disarmed", 1} },
+			{ EChaosEvent::MakeAllNPCsInvisible, {[this]() { HandleMakeAllNPCsInvisible(); }, "Ghost NPCs", 1000} },
+			{ EChaosEvent::MakeAllNPCsEnforcers, {[this]() { HandleMakeAllNPCsEnforcers(); }, "Upstanding Citizens", 1000} },
+			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(); }, "Random Target Teleport", 1}}
 		};
 	}
 };

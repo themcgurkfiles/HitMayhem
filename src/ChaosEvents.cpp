@@ -42,7 +42,7 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
     }
 
     counter += p_UpdateEvent.m_GameTimeDelta.ToSeconds();
-    if (counter >= 30) {
+    if (counter >= 20) {
         ExecuteRandomEvent();
         counter = 0;
     }
@@ -54,7 +54,7 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
         if (effect.isEffectActive) {
             if (effect.effectDuration <= 0) {
                 effect.isEffectActive = false;
-                Logger::Debug("Effect {} has ended.", static_cast<int>(it->first));
+                Logger::Debug("Effect '{}' has ended.", it->second.effectName);
                 it = activeEffects.erase(it);  // erase returns a valid next iterator
                 continue;
             } else {
@@ -62,7 +62,7 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
                 effect.effectDuration -= p_UpdateEvent.m_GameTimeDelta.ToSeconds();
                 if (effect.justStarted)
                 {
-                    Logger::Debug("Effect {} has started.", static_cast<int>(it->first));
+                    Logger::Debug("Effect '{}' has started.", it->second.effectName);
                     effect.justStarted = false;
                 }
             }
@@ -420,7 +420,6 @@ void ChaosEvents::InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> 
 
 void ChaosEvents::HandleKillAura()
 {
-    //Logger::Debug("HandleKillAura");
     const auto playerPos = SDK()->GetLocalPlayer().m_ref.QueryInterface<ZSpatialEntity>()->GetWorldMatrix().Trans;
     for (int i = 0; i < *Globals::NextActorId; i++)
     {
@@ -443,7 +442,6 @@ void ChaosEvents::HandleKillAura()
 
 void ChaosEvents::HandleReviveAura()
 {
-    //Logger::Debug("HandleReviveAura");
     const auto playerPos = SDK()->GetLocalPlayer().m_ref.QueryInterface<ZSpatialEntity>()->GetWorldMatrix().Trans;
     for (int i = 0; i < *Globals::NextActorId; i++)
     {
@@ -464,7 +462,6 @@ void ChaosEvents::HandleReviveAura()
 
 void ChaosEvents::HandleInfiniteAmmo()
 {
-    //Logger::Debug("HandleInfiniteAmmo");
     auto it = activeEffects.find(EChaosEvent::InfiniteAmmo);
     if (it != activeEffects.end()) {
         if (it->second.justStarted && !hm5CrippleBox)
@@ -495,7 +492,6 @@ void ChaosEvents::HandleInfiniteAmmo()
 
 void ChaosEvents::HandleMake47Invincible()
 {
-    //Logger::Debug("HandleMake47Invincible");
     auto player = SDK()->GetLocalPlayer();
     if (player.m_pInterfaceRef->m_bIsInvincible == false)
     {
@@ -515,8 +511,6 @@ void ChaosEvents::HandleMake47Invincible()
 void ChaosEvents::HandleRemoveAllWeapons()
 {
     // WIP: NOT CURRENTLY WORKING
-    //Logger::Debug("HandleRemoveAllWeapons");
-
     auto s_LocalHitman = SDK()->GetLocalPlayer();
 
     if (!s_LocalHitman) {
@@ -539,17 +533,16 @@ void ChaosEvents::HandleRemoveAllWeapons()
 
 void ChaosEvents::HandleMakeAllNPCsInvisible()
 {
-    Logger::Debug("HandleMakeAllNPCsInvisible");
+
 }
 
 void ChaosEvents::HandleMakeAllNPCsEnforcers()
 {
-    Logger::Debug("HandleMakeAllNPCsEnforcers");
+
 }
 
 void ChaosEvents::HandleTeleport47ToRandChar()
 {
-    //Logger::Debug("HandleMakeAllNPCsEnforcers");
 	int randomIndex = rand() % *Globals::NextActorId;
     for (int i = 0; i < *Globals::NextActorId; i++)
     {
@@ -569,7 +562,6 @@ void ChaosEvents::HandleTeleport47ToRandChar()
 
 void ChaosEvents::HandleLaunchAllChars()
 {
-    //Logger::Debug("HandleLaunchAllChars");
     auto it = activeEffects.find(EChaosEvent::LaunchAllChars);
     if (it != activeEffects.end()) {
         if (it->second.justStarted)
@@ -650,7 +642,6 @@ void ChaosEvents::HandleLaunch47()
 
 void ChaosEvents::HandleLookingGood47()
 {
-    //Logger::Debug("HandleLookingGood47");
     auto s_LocalHitman = SDK()->GetLocalPlayer();
     ZContentKitManager* s_ContentKitManager = Globals::ContentKitManager;
     int i = 0;
@@ -703,7 +694,6 @@ void ChaosEvents::HandleSpawnFireExtinguishers()
         LoadRepositoryProps();
     }
     
-    //Logger::Debug("HandleSpawnFireExtinguishers");
     auto s_PropPair = GetRepositoryPropFromName("Fire Extinguisher");
     if (s_PropPair.second == ZRepositoryID("")) {
         Logger::Error("Fire Extinguisher not found in repository.");
@@ -723,8 +713,6 @@ void ChaosEvents::HandleSpawnFireExtinguishers()
 
 void ChaosEvents::HandleTeleportTargetsToRandomChar()
 {
-    //Logger::Debug("TeleportTargetsToRandomChar");
-
     for (int i = 0; i < *Globals::NextActorId; i++)
     {
         auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;

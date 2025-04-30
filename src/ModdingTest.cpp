@@ -33,49 +33,45 @@ void ModdingTest::OnDrawMenu() {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteRandomEvent(); }
     }
 
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Kill Aura")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::KillAura); }
-    }
-
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Revive Aura")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::ReviveAura); }
-    }
-
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Invincible")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent:: Make47Invincible); }
-    }
-
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Infinite Ammo")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::InfiniteAmmo); }
-    }
-
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Extinguishers")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnFireExtinguishers); }
-    }
-
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Rand Teleport")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Teleport47ToRandChar); }
-    }
-
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Launch NPC")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LaunchAllChars); }
-    }
-
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Launch 47")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Launch47); }
-    }
-
-    if (ImGui::Button(ICON_MD_LOCK_RESET "LookingGood")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LookingGood47); }
-    }
-
-	if (ImGui::Button(ICON_MD_LOCK_RESET "RandItem")) {
-		if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnRandomItem); }
-	}
-
-    if (ImGui::Button(ICON_MD_LOCK_RESET "FireExtinguish")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnFireExtinguishers); }
-    }
+    //if (ImGui::Button(ICON_MD_LOCK_RESET "Kill Aura")) {
+    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::KillAura); }
+    //}
+    //
+    //if (ImGui::Button(ICON_MD_LOCK_RESET "Revive Aura")) {
+    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::ReviveAura); }
+    //}
+    //
+    //if (ImGui::Button(ICON_MD_LOCK_RESET "Invincible")) {
+    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Make47Invincible); }
+    //}
+    //
+    //if (ImGui::Button(ICON_MD_LOCK_RESET "Infinite Ammo")) {
+    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::InfiniteAmmo); }
+    //}
+    //
+    //if (ImGui::Button(ICON_MD_LOCK_RESET "Rand Teleport")) {
+    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Teleport47ToRandChar); }
+    //}
+    //
+    //if (ImGui::Button(ICON_MD_LOCK_RESET "Launch NPC")) {
+    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LaunchAllChars); }
+    //}
+    //
+    //if (ImGui::Button(ICON_MD_LOCK_RESET "Launch 47")) {
+    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Launch47); }
+    //}
+    //
+    //if (ImGui::Button(ICON_MD_LOCK_RESET "LookingGood")) {
+    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LookingGood47); }
+    //}
+    //
+	//if (ImGui::Button(ICON_MD_LOCK_RESET "RandItem")) {
+	//	if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnRandomItem); }
+	//}
+    //
+    //if (ImGui::Button(ICON_MD_LOCK_RESET "FireExtinguish")) {
+    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnFireExtinguishers); }
+    //}
 }
 
 void ModdingTest::OnDrawUI(bool p_HasFocus) {

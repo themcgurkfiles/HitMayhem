@@ -2,7 +2,7 @@
 
 HitMayhem Randomizer adds a chaos-style twist to the Hitman WOA!
 
-Every 30 seconds, a random effect gets applied to the game world. From a cascase of rubber-duck informants, to tumultuous target bombardments, enjoy a large variety in reality-bending events!
+Every 20 seconds, a random effect gets applied to the game world. From a cascase of rubber-duck informants, to tumultuous target bombardments, enjoy a large variety in reality-bending events!
 
 This is a work-in-progress, student project of mine, that I'll be working on intermittently.
 

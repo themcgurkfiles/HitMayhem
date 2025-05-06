@@ -79,7 +79,7 @@ void ModdingTest::OnDrawUI(bool p_HasFocus) {
     
     if (SDK())
     {
-        ImGui::SetNextWindowPos(ImVec2(0, 250), ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImVec2(0, 500), ImGuiCond_Always);
         ImGui::SetNextWindowSizeConstraints(ImVec2(80, 25), ImVec2(1500, 200));
         ImGui::SetNextWindowBgAlpha(1.f);
         ImGui::Begin("ChaosEvents", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
@@ -89,6 +89,18 @@ void ModdingTest::OnDrawUI(bool p_HasFocus) {
 			for (auto it = m_ChaosEvents->activeEffects.begin(); it != m_ChaosEvents->activeEffects.end(); ++it) {
 				const auto& effect = it->second;
 				ImGui::Text("%s", effect.effectName.c_str());
+                ImGui::SameLine();
+
+                std::string stringDuration = std::to_string(effect.effectDuration);
+
+				if (stringDuration.length() > 2) {
+					stringDuration.insert(stringDuration.length() - 2, ".");
+				}
+				else {
+					stringDuration.insert(0, "0.");
+				}
+
+                ImGui::TextColored(ImVec4(1, 1, 0, 1), "%s", stringDuration.c_str());
 			}
 		}
     }

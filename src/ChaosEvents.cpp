@@ -69,6 +69,21 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
         }
         ++it;
     }
+
+    if (Functions::ZInputAction_Digital->Call(&m_JumpAction, -1)) {
+        Logger::Debug("Jump input detected.");
+        ActivateJump();
+    }
+
+    if (isJumping)
+    {
+        jumpCounter += p_UpdateEvent.m_GameTimeDelta.ToSeconds();
+        if (jumpCounter >= 2.3) {
+            DeactivateJump();
+            isJumping = false;
+            jumpCounter = 0;
+        }
+    }
 }
 
 
@@ -415,6 +430,43 @@ void ChaosEvents::InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> 
     }
 }
 
+void ChaosEvents::ActivateJump()
+{
+	auto s_LocalHitman = SDK()->GetLocalPlayer();
+	if (!s_LocalHitman) {
+		Logger::Debug("No local hitman.");
+		return;
+	}
+	if (canJump && !isJumping) {
+		isJumping = true;
+        Functions::ZHM5BaseCharacter_ActivatePoweredRagdoll->Call(
+            SDK()->GetLocalPlayer().m_pInterfaceRef, 0.3f, true, false, 0.15f, false);
+
+        auto* localRagdoller = SDK()->GetLocalPlayer().m_pInterfaceRef->m_pRagdollHandler;
+        if (localRagdoller)
+        {
+            Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
+                localRagdoller, float4(0, 0, 0, 0), float4(0, 150, 250, 1), 1, false);
+        }
+	}
+}
+
+void ChaosEvents::DeactivateJump()
+{
+	auto s_LocalHitman = SDK()->GetLocalPlayer();
+	if (!s_LocalHitman) {
+		Logger::Debug("No local hitman.");
+		return;
+	}
+	if (isJumping) {
+		isJumping = false;
+		Functions::ZHM5BaseCharacter_DeactivateRagdoll->Call(SDK()->GetLocalPlayer().m_pInterfaceRef);
+        const auto s_Animator = SDK()->GetLocalPlayer().m_pInterfaceRef->m_Animator.QueryInterface<ZHM5Animator>();
+        auto s_Time = 1.f;
+        Functions::ZHM5Animator_ActivateRagdollToAnimationBlend->Call(s_Animator, &s_Time);
+	}
+}
+
 
 // Effect Functions can be found below:
 
@@ -722,5 +774,21 @@ void ChaosEvents::HandleTeleportTargetsToRandomChar()
         // check if actors are targets:
         actor->GetType();
 
+    }
+}
+
+void ChaosEvents::HandleEnableSpaceToJump()
+{
+    auto it = activeEffects.find(EChaosEvent::EnableSpaceToJump);
+    if (it != activeEffects.end()) {
+        if (it->second.justStarted)
+        {
+            canJump = true;
+        }
+
+		else if (it->second.effectDuration <= 1)
+		{
+			canJump = false;
+		}
     }
 }

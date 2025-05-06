@@ -19,6 +19,16 @@ void ModdingTest::OnEngineInitialized() {
     // Initialize the ChaosEvents class
     m_ChaosEvents = new ChaosEvents();
 
+    // custom binds
+    const char* binds = "Jump=tap(kb,space);";
+    if (ZInputActionManager::AddBindings(binds)) {
+        Logger::Debug("Successfully added bindings.");
+    }
+    else {
+        Logger::Debug("Failed to add bindings.");
+    }
+
+
 	const ZMemberDelegate<ChaosEvents, void(const SGameUpdateEvent&)> s_Delegate(m_ChaosEvents, &ChaosEvents::OnFrameUpdate);
     Globals::GameLoopManager->RegisterFrameUpdate(s_Delegate, 1, EUpdateMode::eUpdatePlayMode);
 
@@ -31,6 +41,10 @@ void ModdingTest::OnDrawMenu() {
 
 	if (ImGui::Button(ICON_MD_LOCK_RESET "Trigger a Random Chaos Event")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteRandomEvent(); }
+    }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Enable Jump")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::EnableSpaceToJump); }
     }
 
     //if (ImGui::Button(ICON_MD_LOCK_RESET "Kill Aura")) {

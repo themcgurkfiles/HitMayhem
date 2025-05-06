@@ -4,11 +4,14 @@
 
 #include <Glacier/ZHM5CrippleBox.h>
 #include <Glacier/SGameUpdateEvent.h>
+#include <Glacier/ZEntity.h>
+#include <Glacier/ZInput.h>
+#include <Glacier/ZCollision.h>
 
 class ChaosEvents : public IPluginInterface {
 
 public:
-	
+
 	void OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent);
 	
 	// The debug events may or may not be needed, at least random won't pick them.
@@ -24,6 +27,7 @@ public:
 		LookingGood47,
 		SpawnRandomItem,
 		SpawnFireExtinguishers,
+		EnableSpaceToJump,
 		//
 		DebugSampleLastEvent,   // Do not assign
 
@@ -67,11 +71,14 @@ private:
 	void HandleLookingGood47();
 	void HandleSpawnRandomItem();
 	void HandleTeleportTargetsToRandomChar();
+	void HandleEnableSpaceToJump();
 
 public:
 	void ExecuteEvent(EChaosEvent event);
 	EChaosEvent GetRandomEvent();
 	void ExecuteRandomEvent();
+
+	ZInputAction m_JumpAction;
 
 	//--- Stuff that could be moved to a helper file at some point: ---//
 	void CreateCrippleBox();
@@ -81,6 +88,8 @@ public:
 	std::pair<const std::string, ZRepositoryID> GetRepositoryPropFromName(std::string itemName);
 	void InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> s_PropPair, ZSpatialEntity* s_SpatialEntity);
 	void InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> s_PropPair, SMatrix& s_PositionMatrix);
+	void ActivateJump();
+	void DeactivateJump();
 	bool m_Running = false;
 	bool m_ShowMessage = false;
 	bool m_SpawnInWorld = true;
@@ -97,7 +106,11 @@ public:
 
 	float counter = 0.0f;
 
-	ChaosEvents() {
+	bool canJump = false;
+	bool isJumping = false;
+	float jumpCounter = 0.0f;
+
+	ChaosEvents() : m_JumpAction("Jump") {
 		eventHandlers = {
 			// Working effects, ordered from when I got them to work
 			{ EChaosEvent::KillAura,               {[this]() { HandleKillAura(); }, "Kill Aura", 4000}},
@@ -110,6 +123,7 @@ public:
 			{ EChaosEvent::LookingGood47,          {[this]() { HandleLookingGood47(); }, "Looking Good, 47!", 1}},
 			{ EChaosEvent::SpawnRandomItem,		   {[this]() { HandleSpawnRandomItem(); }, "Spawn Random Item", 1} },
 			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(); }, "Fire Extinguisher Nuke", 10} },
+			{ EChaosEvent::EnableSpaceToJump,	   {[this]() { HandleEnableSpaceToJump(); }, "Hit Space to Jump!", 4000} },
 			
 			// Work-in-progress effects, ordered from when I started working on them
 			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(); }, "Disarmed", 1} },

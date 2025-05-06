@@ -74,8 +74,25 @@ void ModdingTest::OnDrawMenu() {
     //}
 }
 
-void ModdingTest::OnDrawUI(bool p_HasFocus) {
-
+void ModdingTest::OnDrawUI(bool p_HasFocus) {  
+    auto s_ImgGuiIO = ImGui::GetIO();
+    
+    if (SDK())
+    {
+        ImGui::SetNextWindowPos(ImVec2(0, 250), ImGuiCond_Always);
+        ImGui::SetNextWindowSizeConstraints(ImVec2(80, 25), ImVec2(1500, 200));
+        ImGui::SetNextWindowBgAlpha(1.f);
+        ImGui::Begin("ChaosEvents", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
+        ImGui::Text("Active Effects:");
+		if (m_ChaosEvents)
+		{
+			for (auto it = m_ChaosEvents->activeEffects.begin(); it != m_ChaosEvents->activeEffects.end(); ++it) {
+				const auto& effect = it->second;
+				ImGui::Text("%s", effect.effectName.c_str());
+			}
+		}
+    }
+    ImGui::End();
 }
 
 ModdingTest::~ModdingTest()

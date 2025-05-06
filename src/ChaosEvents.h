@@ -48,11 +48,11 @@ public:
 		bool justStarted = true;
 	};
 
-private:
 	std::unordered_map<EChaosEvent, ChaosEventData> eventHandlers;
 	std::unordered_map<EChaosEvent, ChaosEventData> activeEffects;
 	EChaosEvent m_CurrentEvent = EChaosEvent::DebugSampleFirstEvent;
 
+private:
 	void HandleKillAura();
 	void HandleReviveAura();
 	void HandleInfiniteAmmo();

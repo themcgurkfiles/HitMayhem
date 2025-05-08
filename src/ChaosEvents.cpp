@@ -41,12 +41,16 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
         return;
     }
 
+
     if (!isProcessingEffects) return;
 
-    counter += p_UpdateEvent.m_GameTimeDelta.ToSeconds();
-    if (counter >= counterLimit) {
-        ExecuteRandomEvent();
-        counter = 0;
+    if (isProcessingRandEffects)
+    {
+        counter += p_UpdateEvent.m_GameTimeDelta.ToSeconds();
+        if (counter >= counterLimit) {
+            ExecuteRandomEvent();
+            counter = 0;
+        }
     }
 
     //Logger::Debug("Counter: {}", counter);

@@ -39,16 +39,16 @@ void ModdingTest::OnEngineInitialized() {
 void ModdingTest::OnDrawMenu() {
     // Toggle our message when the user presses our button.
 
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Toggle Chaos Processing!")) {
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Toggle Chaos Processing")) {
+        if (m_ChaosEvents) { m_ChaosEvents->isProcessingEffects = !m_ChaosEvents->isProcessingEffects; }
+    }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Toggle Timed Random Events")) {
         if (m_ChaosEvents) { m_ChaosEvents->isProcessingEffects = !m_ChaosEvents->isProcessingEffects; }
     }
 
 	if (ImGui::Button(ICON_MD_LOCK_RESET "Trigger a Random Chaos Event")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteRandomEvent(); }
-    }
-
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Enable Jump")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::EnableSpaceToJump); }
     }
 
     //if (ImGui::Button(ICON_MD_LOCK_RESET "Kill Aura")) {
@@ -87,11 +87,15 @@ void ModdingTest::OnDrawMenu() {
 	//	if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnRandomItem); }
 	//}
     //
-    if (ImGui::Button(ICON_MD_LOCK_RESET "FireExtinguish")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnFireExtinguishers); }
+    //if (ImGui::Button(ICON_MD_LOCK_RESET "FireExtinguish")) {
+    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnFireExtinguishers); }
+    //}
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Enable Jump")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::EnableSpaceToJump); }
     }
 
-    if (ImGui::Button(ICON_MD_LOCK_RESET "WalkOnAir")) {
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Walk On Air")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::WalkOnAir); }
     }
 }

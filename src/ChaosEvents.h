@@ -29,6 +29,7 @@ public:
 		Teleport47ToRandChar,
 		LookingGood47,
 		WalkOnAir,
+		Give47Boosters,
 		//
 		DebugSampleLastEvent,   // Do not assign
 
@@ -41,6 +42,10 @@ public:
 		TeleportTargetsToRandomChar,
 		SpawnRubberDucks,
 		SpawnRandomExplosions,
+
+		// Concepts (no funcs made)
+		Hivemind, // Concept is to move all enemies when you move: gonna be a pain to do but funny if possible
+		NPCsFriendlyFire, // I have no idea how this would work, but darn would it be funny
 	};
 
 	struct ChaosEventData {
@@ -87,7 +92,8 @@ public:
 	bool EventTimeElapsedIsLessThan(EChaosEvent event, int time);
 	bool EventTimeElapsedIsGreaterThan(EChaosEvent event, int time);
 	bool EventTimeElapsedIsInRange(EChaosEvent event, int lbound, int hbound);
-	bool isProcessingEffects = true; // Set false to disable mod running
+	bool isProcessingEffects = false; // Set false to disable mod running
+	bool isProcessingRandEffects = false; // Set false to disable random effects
 	//-----------------------//
 
 	//--- Jumping Stuff ---//

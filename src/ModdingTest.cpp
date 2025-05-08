@@ -40,11 +40,11 @@ void ModdingTest::OnDrawMenu() {
     // Toggle our message when the user presses our button.
 
     if (ImGui::Button(ICON_MD_LOCK_RESET "Toggle Chaos Processing")) {
-        if (m_ChaosEvents) { m_ChaosEvents->isProcessingEffects = !m_ChaosEvents->isProcessingEffects; }
+        if (m_ChaosEvents) { m_ChaosEvents->isProcessingEffects = !m_ChaosEvents->isProcessingEffects; m_ChaosEvents->activeEffects.clear(); }
     }
 
     if (ImGui::Button(ICON_MD_LOCK_RESET "Toggle Timed Random Events")) {
-        if (m_ChaosEvents) { m_ChaosEvents->isProcessingEffects = !m_ChaosEvents->isProcessingEffects; }
+        if (m_ChaosEvents) { m_ChaosEvents->isProcessingRandEffects = !m_ChaosEvents->isProcessingRandEffects; }
     }
 
 	if (ImGui::Button(ICON_MD_LOCK_RESET "Trigger a Random Chaos Event")) {
@@ -97,6 +97,10 @@ void ModdingTest::OnDrawMenu() {
 
     if (ImGui::Button(ICON_MD_LOCK_RESET "Walk On Air")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::WalkOnAir); }
+    }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Give 47 Boosters")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Give47Boosters); }
     }
 }
 

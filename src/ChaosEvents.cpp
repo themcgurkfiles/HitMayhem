@@ -857,7 +857,8 @@ void ChaosEvents::HandleSpawnRandomItem(EChaosEvent eventRef)
 
     auto s_SpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
     SMatrix s_HitmanWorldMatrix = s_SpatialEntity->GetWorldMatrix();
-    s_HitmanWorldMatrix.Trans += float4(0, 0, 2, 0);
+    s_HitmanWorldMatrix.Trans += float4(0, 0, 1, 0);
+    m_SpawnInWorld = true;
     InitiateSpawnItem(s_PropPair, s_HitmanWorldMatrix);
 }
 
@@ -884,6 +885,7 @@ void ChaosEvents::HandleSpawnFireExtinguishers(EChaosEvent eventRef)
     auto s_SpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
 	SMatrix s_HitmanWorldMatrix = s_SpatialEntity->GetWorldMatrix();
     s_HitmanWorldMatrix.Trans += float4(0, 0, 2, 0);
+    m_SpawnInWorld = true;
     InitiateSpawnItem(s_PropPair, s_HitmanWorldMatrix);
 }
 
@@ -934,4 +936,30 @@ void ChaosEvents::HandleWalkOnAir(EChaosEvent eventRef)
         isAirWalking = false;
         maintainedZCoord = 0;
     }
+}
+
+void ChaosEvents::HandleGive47Boosters(EChaosEvent eventRef)
+{
+    if (EventTimeElapsedIsGreaterThan(eventRef, 10)) return;
+
+    if (m_RepositoryProps.size() == 0)
+    {
+        LoadRepositoryProps();
+    }
+
+    auto s_PropPair = GetRepositoryPropFromName("Octane Booster");
+    if (s_PropPair.second == ZRepositoryID("")) {
+        Logger::Error("Octane Booster not found in repository.");
+        return;
+    }
+    auto s_LocalHitman = SDK()->GetLocalPlayer();
+    if (!s_LocalHitman) {
+        Logger::Error("No local hitman.");
+        return;
+    }
+
+    auto s_SpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
+    SMatrix s_HitmanWorldMatrix = s_SpatialEntity->GetWorldMatrix();
+    m_SpawnInWorld = false;
+    InitiateSpawnItem(s_PropPair, s_HitmanWorldMatrix);
 }

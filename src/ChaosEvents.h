@@ -80,6 +80,7 @@ private:
 	void HandleTeleportTargetsToRandomChar(EChaosEvent eventRef);
 	void HandleEnableSpaceToJump(EChaosEvent eventRef);
 	void HandleWalkOnAir(EChaosEvent eventRef);
+	void HandleGive47Boosters(EChaosEvent eventRef);
 
 public:
 	//--- Event Processing ---//
@@ -144,14 +145,15 @@ public:
 			{ EChaosEvent::ReviveAura,             {[this]() { HandleReviveAura(EChaosEvent::ReviveAura); }, "Revive Aura", 4000} },
 			{ EChaosEvent::InfiniteAmmo,           {[this]() { HandleInfiniteAmmo(EChaosEvent::InfiniteAmmo); }, "Infinite Ammo", 4000} },
 			{ EChaosEvent::Make47Invincible,       {[this]() { HandleMake47Invincible(EChaosEvent::Make47Invincible); }, "GODMODE!!!", 4000} },
-			{ EChaosEvent::Teleport47ToRandChar,   {[this]() { HandleTeleport47ToRandChar(EChaosEvent::Teleport47ToRandChar); }, "Teleport to Random NPC", 500}}, // 1 sec
+			{ EChaosEvent::Teleport47ToRandChar,   {[this]() { HandleTeleport47ToRandChar(EChaosEvent::Teleport47ToRandChar); }, "Where In the World is Agent 47?", 500}},
 			{ EChaosEvent::LaunchAllChars,         {[this]() { HandleLaunchAllChars(EChaosEvent::LaunchAllChars); }, "Launch all NPCs", 100}},
 			{ EChaosEvent::Launch47,               {[this]() { HandleLaunch47(EChaosEvent::Launch47); }, "To The Moon, 47!", 1000}},
-			{ EChaosEvent::LookingGood47,          {[this]() { HandleLookingGood47(EChaosEvent::LookingGood47); }, "Looking Good, 47!", 500}}, // 1 sec
-			{ EChaosEvent::SpawnRandomItem,		   {[this]() { HandleSpawnRandomItem(EChaosEvent::SpawnRandomItem); }, "Spawn Random Item", 500} }, // 1 sec
-			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(EChaosEvent::SpawnFireExtinguishers); }, "Fire Extinguisher Snake", 1000} }, // 1 sec
+			{ EChaosEvent::LookingGood47,          {[this]() { HandleLookingGood47(EChaosEvent::LookingGood47); }, "Looking Good, 47!", 500}},
+			{ EChaosEvent::SpawnRandomItem,		   {[this]() { HandleSpawnRandomItem(EChaosEvent::SpawnRandomItem); }, "Spawn Random Item", 500} },
+			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(EChaosEvent::SpawnFireExtinguishers); }, "Fire Extinguisher Snake", 1000} },
 			{ EChaosEvent::EnableSpaceToJump,	   {[this]() { HandleEnableSpaceToJump(EChaosEvent::EnableSpaceToJump); }, "Hit Space to Jump!", 4000} },
 			{ EChaosEvent::WalkOnAir,			   {[this]() { HandleWalkOnAir(EChaosEvent::WalkOnAir); }, "Press F to Walk on Air!", 4000} },
+			{ EChaosEvent::Give47Boosters,		   {[this]() { HandleGive47Boosters(EChaosEvent::Give47Boosters); }, "A Well-Needed Boost", 500} },
 			
 			// Work-in-progress effects, ordered from when I started working on them
 			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(EChaosEvent::RemoveAllWeapons); }, "Disarmed", 1} },

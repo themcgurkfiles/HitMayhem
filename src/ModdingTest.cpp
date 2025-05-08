@@ -39,6 +39,10 @@ void ModdingTest::OnEngineInitialized() {
 void ModdingTest::OnDrawMenu() {
     // Toggle our message when the user presses our button.
 
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Toggle Chaos Processing!")) {
+        if (m_ChaosEvents) { m_ChaosEvents->isProcessingEffects = !m_ChaosEvents->isProcessingEffects; }
+    }
+
 	if (ImGui::Button(ICON_MD_LOCK_RESET "Trigger a Random Chaos Event")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteRandomEvent(); }
     }
@@ -86,6 +90,10 @@ void ModdingTest::OnDrawMenu() {
     if (ImGui::Button(ICON_MD_LOCK_RESET "FireExtinguish")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnFireExtinguishers); }
     }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "WalkOnAir")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::WalkOnAir); }
+    }
 }
 
 void ModdingTest::OnDrawUI(bool p_HasFocus) {  
@@ -96,11 +104,15 @@ void ModdingTest::OnDrawUI(bool p_HasFocus) {
         ImGui::SetNextWindowPos(ImVec2(0, 500), ImGuiCond_Always);
         ImGui::SetNextWindowSizeConstraints(ImVec2(80, 25), ImVec2(1500, 200));
         ImGui::SetNextWindowBgAlpha(1.f);
-        ImGui::Begin("ChaosEvents", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
-        ImGui::Text("Active Effects:");
+        ImGui::Begin("ChaosEvents", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar);
+        ImGui::Text("Time Until Next Effect: ");
 		if (m_ChaosEvents)
 		{
-			for (auto it = m_ChaosEvents->activeEffects.begin(); it != m_ChaosEvents->activeEffects.end(); ++it) {
+            ImGui::SameLine();
+            ImGui::TextColored(ImVec4(1, 1, 0, 1), "%s", std::to_string(m_ChaosEvents->counterLimit - m_ChaosEvents->counter).c_str());
+            
+            ImGui::Text("Active Effects:");
+            for (auto it = m_ChaosEvents->activeEffects.begin(); it != m_ChaosEvents->activeEffects.end(); ++it) {
 				const auto& effect = it->second;
 				ImGui::Text("%s", effect.effectName.c_str());
                 ImGui::SameLine();

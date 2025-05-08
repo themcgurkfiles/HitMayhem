@@ -87,6 +87,7 @@ public:
 	bool EventTimeElapsedIsLessThan(EChaosEvent event, int time);
 	bool EventTimeElapsedIsGreaterThan(EChaosEvent event, int time);
 	bool EventTimeElapsedIsInRange(EChaosEvent event, int lbound, int hbound);
+	bool isProcessingEffects = true; // Set false to disable mod running
 	//-----------------------//
 
 	//--- Jumping Stuff ---//
@@ -97,6 +98,7 @@ public:
 	bool isJumping = false;
 	float jumpCounter = 0.0f;
 	float counter = 0.0f;
+	float counterLimit = 20;
 	//---------------------//
 
 	//--- AirWalk Stuff ---//
@@ -104,7 +106,7 @@ public:
 	void HandleWalkOnAir();
 	bool isAirWalking = false;
 	bool canAirWalk = false;
-	float4 maintainedZAxis;
+	float maintainedZCoord;
 	//---------------------//
 
 	//--- Stuff that could be moved to a helper file at some point: ---//

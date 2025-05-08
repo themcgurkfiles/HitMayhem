@@ -41,8 +41,10 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
         return;
     }
 
+    if (!isProcessingEffects) return;
+
     counter += p_UpdateEvent.m_GameTimeDelta.ToSeconds();
-    if (counter >= 20) {
+    if (counter >= counterLimit) {
         ExecuteRandomEvent();
         counter = 0;
     }
@@ -78,7 +80,21 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
     if (Functions::ZInputAction_Digital->Call(&m_AirwalkAction, -1)) {
         Logger::Debug("Airwalk input detected.");
         if (!canAirWalk) return;
+
         isAirWalking = !isAirWalking;
+
+        auto s_LocalHitman = SDK()->GetLocalPlayer();
+        if (!s_LocalHitman) {
+            Logger::Error("No local hitman.");
+            return;
+        }
+        auto s_SpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
+        SMatrix s_HitmanWorldMatrix = s_SpatialEntity->GetWorldMatrix();
+        maintainedZCoord = s_HitmanWorldMatrix.Trans.z + 1;
+    }
+
+    if (isAirWalking)
+    {
         HandleWalkOnAir();
     }
 
@@ -486,7 +502,8 @@ void ChaosEvents::HandleWalkOnAir()
     {
         auto s_SpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
         SMatrix s_HitmanWorldMatrix = s_SpatialEntity->GetWorldMatrix();
-        s_HitmanWorldMatrix.ZAxis = maintainedZAxis;
+        s_HitmanWorldMatrix.Trans.z = maintainedZCoord;
+        s_SpatialEntity->SetWorldMatrix(s_HitmanWorldMatrix);
     }
 }
 
@@ -906,13 +923,11 @@ void ChaosEvents::HandleWalkOnAir(EChaosEvent eventRef)
     if (EventJustStarted(eventRef))
     {
         canAirWalk = true;
-        auto s_SpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
-        SMatrix s_HitmanWorldMatrix = s_SpatialEntity->GetWorldMatrix();
-        s_HitmanWorldMatrix.ZAxis = maintainedZAxis;
     }
     else if (EventIsEnding(eventRef))
     {
         canAirWalk = false;
-        maintainedZAxis = 0;
+        isAirWalking = false;
+        maintainedZCoord = 0;
     }
 }

@@ -28,6 +28,7 @@ public:
 		EnableSpaceToJump,
 		Teleport47ToRandChar,
 		LookingGood47,
+		WalkOnAir,
 		//
 		DebugSampleLastEvent,   // Do not assign
 
@@ -73,6 +74,7 @@ private:
 	void HandleSpawnRandomItem(EChaosEvent eventRef);
 	void HandleTeleportTargetsToRandomChar(EChaosEvent eventRef);
 	void HandleEnableSpaceToJump(EChaosEvent eventRef);
+	void HandleWalkOnAir(EChaosEvent eventRef);
 
 public:
 	//--- Event Processing ---//
@@ -81,10 +83,10 @@ public:
 	void ExecuteRandomEvent();
 	bool EventJustStarted(EChaosEvent event);
 	bool EventIsEnding(EChaosEvent event);
-	bool EventTimeIsEqualTo(EChaosEvent event, int time);
-	bool EventTimeIsLessThan(EChaosEvent event, int time);
-	bool EventTimeIsGreaterThan(EChaosEvent event, int time);
-	bool EventTimerIsInRange(EChaosEvent event, int lbound, int hbound);
+	bool EventTimeElapsedIsEqualTo(EChaosEvent event, int time);
+	bool EventTimeElapsedIsLessThan(EChaosEvent event, int time);
+	bool EventTimeElapsedIsGreaterThan(EChaosEvent event, int time);
+	bool EventTimeElapsedIsInRange(EChaosEvent event, int lbound, int hbound);
 	//-----------------------//
 
 	//--- Jumping Stuff ---//
@@ -95,6 +97,14 @@ public:
 	bool isJumping = false;
 	float jumpCounter = 0.0f;
 	float counter = 0.0f;
+	//---------------------//
+
+	//--- AirWalk Stuff ---//
+	ZInputAction m_AirwalkAction;
+	void HandleWalkOnAir();
+	bool isAirWalking = false;
+	bool canAirWalk = false;
+	float4 maintainedZAxis;
 	//---------------------//
 
 	//--- Stuff that could be moved to a helper file at some point: ---//
@@ -119,7 +129,7 @@ public:
 	ZHM5CrippleBox* hm5CrippleBox = nullptr;
 	//------------------------------------------------------------------//
 
-	ChaosEvents() : m_JumpAction("Jump") {
+	ChaosEvents() : m_JumpAction("Jump"), m_AirwalkAction("Airwalk") {
 		eventHandlers = {
 			// Working effects, ordered from when I got them to work
 			{ EChaosEvent::KillAura,               {[this]() { HandleKillAura(EChaosEvent::KillAura); }, "Kill Aura", 4000}},
@@ -131,8 +141,9 @@ public:
 			{ EChaosEvent::Launch47,               {[this]() { HandleLaunch47(EChaosEvent::Launch47); }, "To The Moon, 47!", 1000}},
 			{ EChaosEvent::LookingGood47,          {[this]() { HandleLookingGood47(EChaosEvent::LookingGood47); }, "Looking Good, 47!", 500}}, // 1 sec
 			{ EChaosEvent::SpawnRandomItem,		   {[this]() { HandleSpawnRandomItem(EChaosEvent::SpawnRandomItem); }, "Spawn Random Item", 500} }, // 1 sec
-			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(EChaosEvent::SpawnFireExtinguishers); }, "Fire Extinguisher Nuke", 510} }, // 1 sec
+			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(EChaosEvent::SpawnFireExtinguishers); }, "Fire Extinguisher Snake", 1000} }, // 1 sec
 			{ EChaosEvent::EnableSpaceToJump,	   {[this]() { HandleEnableSpaceToJump(EChaosEvent::EnableSpaceToJump); }, "Hit Space to Jump!", 4000} },
+			{ EChaosEvent::WalkOnAir,			   {[this]() { HandleWalkOnAir(EChaosEvent::WalkOnAir); }, "Press F to Walk on Air!", 4000} },
 			
 			// Work-in-progress effects, ordered from when I started working on them
 			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(EChaosEvent::RemoveAllWeapons); }, "Disarmed", 1} },

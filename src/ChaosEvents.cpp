@@ -71,8 +71,15 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
     }
 
     if (Functions::ZInputAction_Digital->Call(&m_JumpAction, -1)) {
-        Logger::Debug("Jump input detected.");
+        //Logger::Debug("Jump input detected.");
         ActivateJump();
+    }
+
+    if (Functions::ZInputAction_Digital->Call(&m_AirwalkAction, -1)) {
+        Logger::Debug("Airwalk input detected.");
+        if (!canAirWalk) return;
+        isAirWalking = !isAirWalking;
+        HandleWalkOnAir();
     }
 
     if (isJumping)
@@ -467,6 +474,22 @@ void ChaosEvents::DeactivateJump()
 	}
 }
 
+void ChaosEvents::HandleWalkOnAir()
+{
+    auto s_LocalHitman = SDK()->GetLocalPlayer();
+    if (!s_LocalHitman) {
+        Logger::Error("No local hitman.");
+        return;
+    }
+
+    if (isAirWalking)
+    {
+        auto s_SpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
+        SMatrix s_HitmanWorldMatrix = s_SpatialEntity->GetWorldMatrix();
+        s_HitmanWorldMatrix.ZAxis = maintainedZAxis;
+    }
+}
+
 bool ChaosEvents::EventJustStarted(EChaosEvent event)
 {
 	auto it = activeEffects.find(event);
@@ -488,7 +511,7 @@ bool ChaosEvents::EventIsEnding(EChaosEvent event)
     return false;
 }
 
-bool ChaosEvents::EventTimeIsEqualTo(EChaosEvent event, int time)
+bool ChaosEvents::EventTimeElapsedIsEqualTo(EChaosEvent event, int time)
 {
     auto it = activeEffects.find(event);
     if (it != activeEffects.end()) {
@@ -500,11 +523,12 @@ bool ChaosEvents::EventTimeIsEqualTo(EChaosEvent event, int time)
     return false;
 }
 
-bool ChaosEvents::EventTimeIsLessThan(EChaosEvent event, int time)
+bool ChaosEvents::EventTimeElapsedIsLessThan(EChaosEvent event, int time)
 {
     auto it = activeEffects.find(event);
     if (it != activeEffects.end()) {
-        if (it->second.effectDuration < time)
+        int timeEffectRan = eventHandlers.find(event)->second.effectDuration - it->second.effectDuration;
+        if (timeEffectRan < time)
         {
             return true;
         }
@@ -512,11 +536,12 @@ bool ChaosEvents::EventTimeIsLessThan(EChaosEvent event, int time)
     return false;
 }
 
-bool ChaosEvents::EventTimeIsGreaterThan(EChaosEvent event, int time)
+bool ChaosEvents::EventTimeElapsedIsGreaterThan(EChaosEvent event, int time)
 {
     auto it = activeEffects.find(event);
     if (it != activeEffects.end()) {
-        if (it->second.effectDuration > time)
+        int timeEffectRan = eventHandlers.find(event)->second.effectDuration - it->second.effectDuration;
+        if (timeEffectRan > time)
         {
             return true;
         }
@@ -524,11 +549,12 @@ bool ChaosEvents::EventTimeIsGreaterThan(EChaosEvent event, int time)
     return false;
 }
 
-bool ChaosEvents::EventTimerIsInRange(EChaosEvent event, int lbound, int hbound)
+bool ChaosEvents::EventTimeElapsedIsInRange(EChaosEvent event, int lbound, int hbound)
 {
     auto it = activeEffects.find(event);
     if (it != activeEffects.end()) {
-        if (it->second.effectDuration <= hbound && it->second.effectDuration >= lbound)
+        int timeEffectRan = eventHandlers.find(event)->second.effectDuration - it->second.effectDuration;
+        if (timeEffectRan <= hbound && timeEffectRan >= lbound)
         {
             return true;
         }
@@ -816,8 +842,7 @@ void ChaosEvents::HandleSpawnRandomItem(EChaosEvent eventRef)
 
 void ChaosEvents::HandleSpawnFireExtinguishers(EChaosEvent eventRef)
 {
-    if (!EventTimeIsGreaterThan(eventRef, 10))
-        return;
+    if (EventTimeElapsedIsGreaterThan(eventRef, 200)) return;
     
     if (m_RepositoryProps.size() == 0)
     {
@@ -868,4 +893,26 @@ void ChaosEvents::HandleEnableSpaceToJump(EChaosEvent eventRef)
 	{
 		canJump = false;
 	}
+}
+
+void ChaosEvents::HandleWalkOnAir(EChaosEvent eventRef)
+{
+    auto s_LocalHitman = SDK()->GetLocalPlayer();
+    if (!s_LocalHitman) {
+        Logger::Error("No local hitman.");
+        return;
+    }
+
+    if (EventJustStarted(eventRef))
+    {
+        canAirWalk = true;
+        auto s_SpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
+        SMatrix s_HitmanWorldMatrix = s_SpatialEntity->GetWorldMatrix();
+        s_HitmanWorldMatrix.ZAxis = maintainedZAxis;
+    }
+    else if (EventIsEnding(eventRef))
+    {
+        canAirWalk = false;
+        maintainedZAxis = 0;
+    }
 }

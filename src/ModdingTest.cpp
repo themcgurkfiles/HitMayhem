@@ -20,7 +20,7 @@ void ModdingTest::OnEngineInitialized() {
     m_ChaosEvents = new ChaosEvents();
 
     // custom binds
-    const char* binds = "Jump=tap(kb,space);";
+    const char* binds = "Jump=tap(kb,space); Airwalk=tap(kb,f);";
     if (ZInputActionManager::AddBindings(binds)) {
         Logger::Debug("Successfully added bindings.");
     }
@@ -83,9 +83,9 @@ void ModdingTest::OnDrawMenu() {
 	//	if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnRandomItem); }
 	//}
     //
-    //if (ImGui::Button(ICON_MD_LOCK_RESET "FireExtinguish")) {
-    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnFireExtinguishers); }
-    //}
+    if (ImGui::Button(ICON_MD_LOCK_RESET "FireExtinguish")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnFireExtinguishers); }
+    }
 }
 
 void ModdingTest::OnDrawUI(bool p_HasFocus) {  

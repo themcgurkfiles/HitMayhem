@@ -75,11 +75,27 @@ private:
 	void HandleEnableSpaceToJump(EChaosEvent eventRef);
 
 public:
+	//--- Event Processing ---//
 	void ExecuteEvent(EChaosEvent event);
 	EChaosEvent GetRandomEvent();
 	void ExecuteRandomEvent();
+	bool EventJustStarted(EChaosEvent event);
+	bool EventIsEnding(EChaosEvent event);
+	bool EventTimeIsEqualTo(EChaosEvent event, int time);
+	bool EventTimeIsLessThan(EChaosEvent event, int time);
+	bool EventTimeIsGreaterThan(EChaosEvent event, int time);
+	bool EventTimerIsInRange(EChaosEvent event, int lbound, int hbound);
+	//-----------------------//
 
+	//--- Jumping Stuff ---//
 	ZInputAction m_JumpAction;
+	void ActivateJump();
+	void DeactivateJump();
+	bool canJump = false;
+	bool isJumping = false;
+	float jumpCounter = 0.0f;
+	float counter = 0.0f;
+	//---------------------//
 
 	//--- Stuff that could be moved to a helper file at some point: ---//
 	void CreateCrippleBox();
@@ -89,14 +105,10 @@ public:
 	std::pair<const std::string, ZRepositoryID> GetRepositoryPropFromName(std::string itemName);
 	void InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> s_PropPair, ZSpatialEntity* s_SpatialEntity);
 	void InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> s_PropPair, SMatrix& s_PositionMatrix);
-	void ActivateJump();
-	void DeactivateJump();
-	bool EventJustStarted(EChaosEvent event);
-	bool EventIsEnding(EChaosEvent event);
 	bool m_Running = false;
 	bool m_ShowMessage = false;
 	bool m_SpawnInWorld = true;
-	bool m_IncludeItemsWithoutTitle = true;
+	bool m_IncludeItemsWithoutTitle = false; // Changing this to true makes random items weirder. Could be fun, idk tho, lot of useless stuff spawns in.
 	float m_HitmanItemPosition[3] = { 0, 1, 0 };
 	TResourcePtr<ZTemplateEntityFactory> m_RepositoryResource;
 	std::multimap<std::string, ZRepositoryID> m_RepositoryProps;
@@ -106,12 +118,6 @@ public:
 
 	ZHM5CrippleBox* hm5CrippleBox = nullptr;
 	//------------------------------------------------------------------//
-
-	float counter = 0.0f;
-
-	bool canJump = false;
-	bool isJumping = false;
-	float jumpCounter = 0.0f;
 
 	ChaosEvents() : m_JumpAction("Jump") {
 		eventHandlers = {

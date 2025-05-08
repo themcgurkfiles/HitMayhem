@@ -488,6 +488,54 @@ bool ChaosEvents::EventIsEnding(EChaosEvent event)
     return false;
 }
 
+bool ChaosEvents::EventTimeIsEqualTo(EChaosEvent event, int time)
+{
+    auto it = activeEffects.find(event);
+    if (it != activeEffects.end()) {
+        if (it->second.effectDuration == time)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ChaosEvents::EventTimeIsLessThan(EChaosEvent event, int time)
+{
+    auto it = activeEffects.find(event);
+    if (it != activeEffects.end()) {
+        if (it->second.effectDuration < time)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ChaosEvents::EventTimeIsGreaterThan(EChaosEvent event, int time)
+{
+    auto it = activeEffects.find(event);
+    if (it != activeEffects.end()) {
+        if (it->second.effectDuration > time)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ChaosEvents::EventTimerIsInRange(EChaosEvent event, int lbound, int hbound)
+{
+    auto it = activeEffects.find(event);
+    if (it != activeEffects.end()) {
+        if (it->second.effectDuration <= hbound && it->second.effectDuration >= lbound)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 // Effect Functions can be found below:
 
@@ -619,7 +667,10 @@ void ChaosEvents::HandleMakeAllNPCsEnforcers(EChaosEvent eventRef)
 
 void ChaosEvents::HandleTeleport47ToRandChar(EChaosEvent eventRef)
 {
-	int randomIndex = rand() % *Globals::NextActorId;
+    if (!EventJustStarted(eventRef))
+        return;
+    
+    int randomIndex = rand() % *Globals::NextActorId;
     for (int i = 0; i < *Globals::NextActorId; i++)
     {
         auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
@@ -712,6 +763,9 @@ void ChaosEvents::HandleLaunch47(EChaosEvent eventRef)
 
 void ChaosEvents::HandleLookingGood47(EChaosEvent eventRef)
 {
+    if (!EventJustStarted(eventRef))
+        return;
+    
     auto s_LocalHitman = SDK()->GetLocalPlayer();
     ZContentKitManager* s_ContentKitManager = Globals::ContentKitManager;
     int i = 0;
@@ -735,6 +789,9 @@ void ChaosEvents::HandleLookingGood47(EChaosEvent eventRef)
 
 void ChaosEvents::HandleSpawnRandomItem(EChaosEvent eventRef)
 {
+    if (!EventJustStarted(eventRef))
+        return;
+    
     if (m_RepositoryProps.size() == 0)
     {
         LoadRepositoryProps();
@@ -759,6 +816,9 @@ void ChaosEvents::HandleSpawnRandomItem(EChaosEvent eventRef)
 
 void ChaosEvents::HandleSpawnFireExtinguishers(EChaosEvent eventRef)
 {
+    if (!EventTimeIsGreaterThan(eventRef, 10))
+        return;
+    
     if (m_RepositoryProps.size() == 0)
     {
         LoadRepositoryProps();
@@ -783,6 +843,9 @@ void ChaosEvents::HandleSpawnFireExtinguishers(EChaosEvent eventRef)
 
 void ChaosEvents::HandleTeleportTargetsToRandomChar(EChaosEvent eventRef)
 {
+    if (!EventJustStarted(eventRef))
+        return;
+    
     for (int i = 0; i < *Globals::NextActorId; i++)
     {
         auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;

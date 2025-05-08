@@ -467,10 +467,31 @@ void ChaosEvents::DeactivateJump()
 	}
 }
 
+bool ChaosEvents::EventJustStarted(EChaosEvent event)
+{
+	auto it = activeEffects.find(event);
+	if (it != activeEffects.end()) {
+		return it->second.justStarted;
+	}
+	return false;
+}
+
+bool ChaosEvents::EventIsEnding(EChaosEvent event)
+{
+    auto it = activeEffects.find(event);
+    if (it != activeEffects.end()) {
+        if (it->second.effectDuration <= 1)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 // Effect Functions can be found below:
 
-void ChaosEvents::HandleKillAura()
+void ChaosEvents::HandleKillAura(EChaosEvent eventRef)
 {
     const auto playerPos = SDK()->GetLocalPlayer().m_ref.QueryInterface<ZSpatialEntity>()->GetWorldMatrix().Trans;
     for (int i = 0; i < *Globals::NextActorId; i++)
@@ -492,7 +513,7 @@ void ChaosEvents::HandleKillAura()
     }
 }
 
-void ChaosEvents::HandleReviveAura()
+void ChaosEvents::HandleReviveAura(EChaosEvent eventRef)
 {
     const auto playerPos = SDK()->GetLocalPlayer().m_ref.QueryInterface<ZSpatialEntity>()->GetWorldMatrix().Trans;
     for (int i = 0; i < *Globals::NextActorId; i++)
@@ -512,55 +533,58 @@ void ChaosEvents::HandleReviveAura()
     }
 }
 
-void ChaosEvents::HandleInfiniteAmmo()
+void ChaosEvents::HandleInfiniteAmmo(EChaosEvent eventRef)
 {
-    auto it = activeEffects.find(EChaosEvent::InfiniteAmmo);
-    if (it != activeEffects.end()) {
-        if (it->second.justStarted && !hm5CrippleBox)
-        {
-            CreateCrippleBox();
-        }
-        if (it->second.justStarted && hm5CrippleBox)
-        {
-            auto s_LocalHitman = SDK()->GetLocalPlayer();
+    if (EventJustStarted(eventRef) && !hm5CrippleBox)
+    {
+        CreateCrippleBox();
+    }
 
-            if (!s_LocalHitman) {
-                Logger::Debug("Local player is not alive.");
-                return;
-            }
+    if (EventJustStarted(eventRef) && hm5CrippleBox)
+    {
+        auto s_LocalHitman = SDK()->GetLocalPlayer();
 
-            hm5CrippleBox->m_bActivateOnStart = true;
-            hm5CrippleBox->m_rHitmanCharacter = s_LocalHitman;
-            hm5CrippleBox->m_bLimitedAmmo = false;
-            hm5CrippleBox->Activate(0);
+        if (!s_LocalHitman) {
+            Logger::Debug("Local player is not alive.");
+            return;
         }
-        else if (it->second.effectDuration <= 1 && hm5CrippleBox)
-        {
-            hm5CrippleBox->m_bLimitedAmmo = true;
-            hm5CrippleBox->Deactivate(0);
-        }
+
+        hm5CrippleBox->m_bActivateOnStart = true;
+        hm5CrippleBox->m_rHitmanCharacter = s_LocalHitman;
+        hm5CrippleBox->m_bLimitedAmmo = false;
+        hm5CrippleBox->Activate(0);
+    }
+
+    if (EventIsEnding(eventRef) && hm5CrippleBox)
+    {
+        hm5CrippleBox->m_bLimitedAmmo = true;
+        hm5CrippleBox->Deactivate(0);
     }
 }
 
-void ChaosEvents::HandleMake47Invincible()
+void ChaosEvents::HandleMake47Invincible(EChaosEvent eventRef)
 {
+    auto it = activeEffects.find(EChaosEvent::InfiniteAmmo);
+
+    if (!EventJustStarted(eventRef) && !hm5CrippleBox)
+    {
+        return;
+    }
+    
     auto player = SDK()->GetLocalPlayer();
     if (player.m_pInterfaceRef->m_bIsInvincible == false)
     {
         player.m_ref.SetProperty("m_bIsInvincible", true);
     }
-    auto it = activeEffects.find(EChaosEvent::Make47Invincible);
-    if (it != activeEffects.end()) {
-        if (it->second.effectDuration <= 1)
-        {
-            player.m_ref.SetProperty("m_bIsInvincible", false);
-            return;
-        }
-    }
 
+    if (EventIsEnding(eventRef))
+    {
+        player.m_ref.SetProperty("m_bIsInvincible", false);
+        return;
+    }
 }
 
-void ChaosEvents::HandleRemoveAllWeapons()
+void ChaosEvents::HandleRemoveAllWeapons(EChaosEvent eventRef)
 {
     // WIP: NOT CURRENTLY WORKING
     auto s_LocalHitman = SDK()->GetLocalPlayer();
@@ -583,17 +607,17 @@ void ChaosEvents::HandleRemoveAllWeapons()
     }
 }
 
-void ChaosEvents::HandleMakeAllNPCsInvisible()
+void ChaosEvents::HandleMakeAllNPCsInvisible(EChaosEvent eventRef)
 {
 
 }
 
-void ChaosEvents::HandleMakeAllNPCsEnforcers()
+void ChaosEvents::HandleMakeAllNPCsEnforcers(EChaosEvent eventRef)
 {
 
 }
 
-void ChaosEvents::HandleTeleport47ToRandChar()
+void ChaosEvents::HandleTeleport47ToRandChar(EChaosEvent eventRef)
 {
 	int randomIndex = rand() % *Globals::NextActorId;
     for (int i = 0; i < *Globals::NextActorId; i++)
@@ -612,87 +636,81 @@ void ChaosEvents::HandleTeleport47ToRandChar()
     }
 }
 
-void ChaosEvents::HandleLaunchAllChars()
+void ChaosEvents::HandleLaunchAllChars(EChaosEvent eventRef)
 {
-    auto it = activeEffects.find(EChaosEvent::LaunchAllChars);
-    if (it != activeEffects.end()) {
-        if (it->second.justStarted)
+    if (EventJustStarted(eventRef))
+    {
+        for (int i = 0; i < *Globals::NextActorId; i++)
         {
-            for (int i = 0; i < *Globals::NextActorId; i++)
+            auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
+
+            if (!actor)
             {
-                auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
-
-                if (!actor)
-                {
-                    Logger::Debug("Actor not checking correctly");
-                    return;
-                }
-
-                ZSpatialEntity* s_SpatialEntity = Globals::ActorManager->m_aActiveActors[i].m_ref.QueryInterface<ZSpatialEntity>();
-                SMatrix s_WorldMatrix = s_SpatialEntity->GetWorldMatrix();
-
-                Functions::ZHM5BaseCharacter_ActivatePoweredRagdoll->Call(
-                    actor, 0.3f, true, false, 0.15f, false
-                );
-
-                auto* ragdoller = actor->m_pRagdollHandler;
-                if (ragdoller)
-                {
-                    Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
-                        ragdoller, float4(0, 0, 0, 0), float4(0, 0, 800, 1), i, false
-                    );
-                }
+                Logger::Debug("Actor not checking correctly");
+                return;
             }
-        }
 
-        else if (it->second.effectDuration <= 1)
-        {
-            for (int i = 0; i < *Globals::NextActorId; i++)
-            {
-                
-                auto& actor = Globals::ActorManager->m_aActiveActors[i];
-                Functions::ZHM5BaseCharacter_DeactivateRagdoll->Call(actor.m_pInterfaceRef);
+            ZSpatialEntity* s_SpatialEntity = Globals::ActorManager->m_aActiveActors[i].m_ref.QueryInterface<ZSpatialEntity>();
+            SMatrix s_WorldMatrix = s_SpatialEntity->GetWorldMatrix();
 
-                auto* ragdoller = actor.m_pInterfaceRef->m_pRagdollHandler;
-                if (ragdoller)
-                {
-                    Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
-                        ragdoller, float4(0, 0, 0, 0), float4(0, 0, 50, 1), i, false
-                    );
-                }
-            }
-        }
-    }
-}
-
-void ChaosEvents::HandleLaunch47()
-{
-    auto it = activeEffects.find(EChaosEvent::Launch47);
-    if (it != activeEffects.end()) {
-        if (it->second.justStarted)
-        {
             Functions::ZHM5BaseCharacter_ActivatePoweredRagdoll->Call(
-                SDK()->GetLocalPlayer().m_pInterfaceRef, 0.3f, true, false, 0.15f, false);
+                actor, 0.3f, true, false, 0.15f, false
+            );
 
-            auto* localRagdoller = SDK()->GetLocalPlayer().m_pInterfaceRef->m_pRagdollHandler;
-            if (localRagdoller)
+            auto* ragdoller = actor->m_pRagdollHandler;
+            if (ragdoller)
             {
                 Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
-                    localRagdoller, float4(0, 0, 0, 0), float4(0, 0, 1600, 1), 1, false);
+                    ragdoller, float4(0, 0, 0, 0), float4(0, 0, 800, 1), i, false
+                );
             }
         }
+    }
 
-        else if (it->second.effectDuration <= 1)
+    if (EventIsEnding(eventRef))
+    {
+        for (int i = 0; i < *Globals::NextActorId; i++)
         {
-            Functions::ZHM5BaseCharacter_DeactivateRagdoll->Call(SDK()->GetLocalPlayer().m_pInterfaceRef);
-            const auto s_Animator = SDK()->GetLocalPlayer().m_pInterfaceRef->m_Animator.QueryInterface<ZHM5Animator>();
-            auto s_Time = 1.f;
-            Functions::ZHM5Animator_ActivateRagdollToAnimationBlend->Call(s_Animator, &s_Time);
+
+            auto& actor = Globals::ActorManager->m_aActiveActors[i];
+            Functions::ZHM5BaseCharacter_DeactivateRagdoll->Call(actor.m_pInterfaceRef);
+
+            auto* ragdoller = actor.m_pInterfaceRef->m_pRagdollHandler;
+            if (ragdoller)
+            {
+                Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
+                    ragdoller, float4(0, 0, 0, 0), float4(0, 0, 50, 1), i, false
+                );
+            }
         }
     }
 }
 
-void ChaosEvents::HandleLookingGood47()
+void ChaosEvents::HandleLaunch47(EChaosEvent eventRef)
+{
+    if (EventJustStarted(eventRef))
+    {
+        Functions::ZHM5BaseCharacter_ActivatePoweredRagdoll->Call(
+            SDK()->GetLocalPlayer().m_pInterfaceRef, 0.3f, true, false, 0.15f, false);
+
+        auto* localRagdoller = SDK()->GetLocalPlayer().m_pInterfaceRef->m_pRagdollHandler;
+        if (localRagdoller)
+        {
+            Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
+                localRagdoller, float4(0, 0, 0, 0), float4(0, 0, 1600, 1), 1, false);
+        }
+    }
+
+    else if (EventIsEnding(eventRef))
+    {
+        Functions::ZHM5BaseCharacter_DeactivateRagdoll->Call(SDK()->GetLocalPlayer().m_pInterfaceRef);
+        const auto s_Animator = SDK()->GetLocalPlayer().m_pInterfaceRef->m_Animator.QueryInterface<ZHM5Animator>();
+        auto s_Time = 1.f;
+        Functions::ZHM5Animator_ActivateRagdollToAnimationBlend->Call(s_Animator, &s_Time);
+    }
+}
+
+void ChaosEvents::HandleLookingGood47(EChaosEvent eventRef)
 {
     auto s_LocalHitman = SDK()->GetLocalPlayer();
     ZContentKitManager* s_ContentKitManager = Globals::ContentKitManager;
@@ -715,7 +733,7 @@ void ChaosEvents::HandleLookingGood47()
     }
 }
 
-void ChaosEvents::HandleSpawnRandomItem()
+void ChaosEvents::HandleSpawnRandomItem(EChaosEvent eventRef)
 {
     if (m_RepositoryProps.size() == 0)
     {
@@ -739,7 +757,7 @@ void ChaosEvents::HandleSpawnRandomItem()
     InitiateSpawnItem(s_PropPair, s_HitmanWorldMatrix);
 }
 
-void ChaosEvents::HandleSpawnFireExtinguishers()
+void ChaosEvents::HandleSpawnFireExtinguishers(EChaosEvent eventRef)
 {
     if (m_RepositoryProps.size() == 0)
     {
@@ -763,7 +781,7 @@ void ChaosEvents::HandleSpawnFireExtinguishers()
     InitiateSpawnItem(s_PropPair, s_HitmanWorldMatrix);
 }
 
-void ChaosEvents::HandleTeleportTargetsToRandomChar()
+void ChaosEvents::HandleTeleportTargetsToRandomChar(EChaosEvent eventRef)
 {
     for (int i = 0; i < *Globals::NextActorId; i++)
     {
@@ -777,18 +795,14 @@ void ChaosEvents::HandleTeleportTargetsToRandomChar()
     }
 }
 
-void ChaosEvents::HandleEnableSpaceToJump()
+void ChaosEvents::HandleEnableSpaceToJump(EChaosEvent eventRef)
 {
-    auto it = activeEffects.find(EChaosEvent::EnableSpaceToJump);
-    if (it != activeEffects.end()) {
-        if (it->second.justStarted)
-        {
-            canJump = true;
-        }
-
-		else if (it->second.effectDuration <= 1)
-		{
-			canJump = false;
-		}
+    if (EventJustStarted(eventRef))
+    {
+		canJump = true;
     }
+	else if (EventIsEnding(eventRef))
+	{
+		canJump = false;
+	}
 }

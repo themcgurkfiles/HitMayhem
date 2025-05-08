@@ -22,14 +22,15 @@ public:
 		ReviveAura,
 		InfiniteAmmo,
 		Make47Invincible,
-		Teleport47ToRandChar,
 		Launch47,
-		LookingGood47,
 		SpawnRandomItem,
 		SpawnFireExtinguishers,
 		EnableSpaceToJump,
+		Teleport47ToRandChar,
+		LookingGood47,
 		//
 		DebugSampleLastEvent,   // Do not assign
+
 
 		// Unused effects for now (work in progress)
 		LaunchAllChars, // TODO: FIX THIS EFFECT, IT WORKS BUT THE NPCS DON'T EVER GET UP!
@@ -57,21 +58,21 @@ public:
 	EChaosEvent m_CurrentEvent = EChaosEvent::DebugSampleFirstEvent;
 
 private:
-	void HandleKillAura();
-	void HandleReviveAura();
-	void HandleInfiniteAmmo();
-	void HandleMake47Invincible();
-	void HandleSpawnFireExtinguishers();
-	void HandleRemoveAllWeapons();
-	void HandleMakeAllNPCsInvisible();
-	void HandleMakeAllNPCsEnforcers();
-	void HandleTeleport47ToRandChar();
-	void HandleLaunchAllChars();
-	void HandleLaunch47();
-	void HandleLookingGood47();
-	void HandleSpawnRandomItem();
-	void HandleTeleportTargetsToRandomChar();
-	void HandleEnableSpaceToJump();
+	void HandleKillAura(EChaosEvent eventRef);
+	void HandleReviveAura(EChaosEvent eventRef);
+	void HandleInfiniteAmmo(EChaosEvent eventRef);
+	void HandleMake47Invincible(EChaosEvent eventRef);
+	void HandleSpawnFireExtinguishers(EChaosEvent eventRef);
+	void HandleRemoveAllWeapons(EChaosEvent eventRef);
+	void HandleMakeAllNPCsInvisible(EChaosEvent eventRef);
+	void HandleMakeAllNPCsEnforcers(EChaosEvent eventRef);
+	void HandleTeleport47ToRandChar(EChaosEvent eventRef);
+	void HandleLaunchAllChars(EChaosEvent eventRef);
+	void HandleLaunch47(EChaosEvent eventRef);
+	void HandleLookingGood47(EChaosEvent eventRef);
+	void HandleSpawnRandomItem(EChaosEvent eventRef);
+	void HandleTeleportTargetsToRandomChar(EChaosEvent eventRef);
+	void HandleEnableSpaceToJump(EChaosEvent eventRef);
 
 public:
 	void ExecuteEvent(EChaosEvent event);
@@ -90,6 +91,8 @@ public:
 	void InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> s_PropPair, SMatrix& s_PositionMatrix);
 	void ActivateJump();
 	void DeactivateJump();
+	bool EventJustStarted(EChaosEvent event);
+	bool EventIsEnding(EChaosEvent event);
 	bool m_Running = false;
 	bool m_ShowMessage = false;
 	bool m_SpawnInWorld = true;
@@ -113,23 +116,23 @@ public:
 	ChaosEvents() : m_JumpAction("Jump") {
 		eventHandlers = {
 			// Working effects, ordered from when I got them to work
-			{ EChaosEvent::KillAura,               {[this]() { HandleKillAura(); }, "Kill Aura", 4000}},
-			{ EChaosEvent::ReviveAura,             {[this]() { HandleReviveAura(); }, "Revive Aura", 4000} },
-			{ EChaosEvent::InfiniteAmmo,           {[this]() { HandleInfiniteAmmo(); }, "Infinite Ammo", 4000} },
-			{ EChaosEvent::Make47Invincible,       {[this]() { HandleMake47Invincible(); }, "GODMODE!!!", 4000} },
-			{ EChaosEvent::Teleport47ToRandChar,   {[this]() { HandleTeleport47ToRandChar(); }, "Teleport to Random NPC", 1}},
-			{ EChaosEvent::LaunchAllChars,         {[this]() { HandleLaunchAllChars(); }, "Launch all NPCs", 100}},
-			{ EChaosEvent::Launch47,               {[this]() { HandleLaunch47(); }, "To The Moon, 47!", 1000}},
-			{ EChaosEvent::LookingGood47,          {[this]() { HandleLookingGood47(); }, "Looking Good, 47!", 1}},
-			{ EChaosEvent::SpawnRandomItem,		   {[this]() { HandleSpawnRandomItem(); }, "Spawn Random Item", 1} },
-			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(); }, "Fire Extinguisher Nuke", 10} },
-			{ EChaosEvent::EnableSpaceToJump,	   {[this]() { HandleEnableSpaceToJump(); }, "Hit Space to Jump!", 4000} },
+			{ EChaosEvent::KillAura,               {[this]() { HandleKillAura(EChaosEvent::KillAura); }, "Kill Aura", 4000}},
+			{ EChaosEvent::ReviveAura,             {[this]() { HandleReviveAura(EChaosEvent::ReviveAura); }, "Revive Aura", 4000} },
+			{ EChaosEvent::InfiniteAmmo,           {[this]() { HandleInfiniteAmmo(EChaosEvent::InfiniteAmmo); }, "Infinite Ammo", 4000} },
+			{ EChaosEvent::Make47Invincible,       {[this]() { HandleMake47Invincible(EChaosEvent::Make47Invincible); }, "GODMODE!!!", 4000} },
+			{ EChaosEvent::Teleport47ToRandChar,   {[this]() { HandleTeleport47ToRandChar(EChaosEvent::Teleport47ToRandChar); }, "Teleport to Random NPC", 500}}, // 1 sec
+			{ EChaosEvent::LaunchAllChars,         {[this]() { HandleLaunchAllChars(EChaosEvent::LaunchAllChars); }, "Launch all NPCs", 100}},
+			{ EChaosEvent::Launch47,               {[this]() { HandleLaunch47(EChaosEvent::Launch47); }, "To The Moon, 47!", 1000}},
+			{ EChaosEvent::LookingGood47,          {[this]() { HandleLookingGood47(EChaosEvent::LookingGood47); }, "Looking Good, 47!", 500}}, // 1 sec
+			{ EChaosEvent::SpawnRandomItem,		   {[this]() { HandleSpawnRandomItem(EChaosEvent::SpawnRandomItem); }, "Spawn Random Item", 500} }, // 1 sec
+			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(EChaosEvent::SpawnFireExtinguishers); }, "Fire Extinguisher Nuke", 510} }, // 1 sec
+			{ EChaosEvent::EnableSpaceToJump,	   {[this]() { HandleEnableSpaceToJump(EChaosEvent::EnableSpaceToJump); }, "Hit Space to Jump!", 4000} },
 			
 			// Work-in-progress effects, ordered from when I started working on them
-			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(); }, "Disarmed", 1} },
-			{ EChaosEvent::MakeAllNPCsInvisible, {[this]() { HandleMakeAllNPCsInvisible(); }, "Ghost NPCs", 1000} },
-			{ EChaosEvent::MakeAllNPCsEnforcers, {[this]() { HandleMakeAllNPCsEnforcers(); }, "Upstanding Citizens", 1000} },
-			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(); }, "Random Target Teleport", 1}}
+			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(EChaosEvent::RemoveAllWeapons); }, "Disarmed", 1} },
+			{ EChaosEvent::MakeAllNPCsInvisible, {[this]() { HandleMakeAllNPCsInvisible(EChaosEvent::MakeAllNPCsInvisible); }, "Ghost NPCs", 1000} },
+			{ EChaosEvent::MakeAllNPCsEnforcers, {[this]() { HandleMakeAllNPCsEnforcers(EChaosEvent::MakeAllNPCsEnforcers); }, "Upstanding Citizens", 1000} },
+			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(EChaosEvent::TeleportTargetsToRandomChar); }, "Random Target Teleport", 1}}
 		};
 	}
 };

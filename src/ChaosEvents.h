@@ -13,6 +13,19 @@ class ChaosEvents : public IPluginInterface {
 public:
 
 	void OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent);
+
+	// Testing the raycasts
+	struct SVector3Less
+	{
+		bool hasBeenDone = false;
+		bool operator()(const SVector3& a, const SVector3& b) const
+		{
+			if (a.x != b.x) return a.x < b.x;
+			if (a.y != b.y) return a.y < b.y;
+			return a.z < b.z;
+		}
+	};
+	std::map<SVector3, SVector3, SVector3Less> linesToRender;
 	
 	// The debug events may or may not be needed, at least random won't pick them.
 	enum class EChaosEvent { 
@@ -30,6 +43,7 @@ public:
 		LookingGood47,
 		WalkOnAir,
 		Give47Boosters,
+		NPCsFriendlyFire, // I have no idea how this would work, but darn would it be funny
 		//
 		DebugSampleLastEvent,   // Do not assign
 
@@ -45,7 +59,6 @@ public:
 
 		// Concepts (no funcs made)
 		Hivemind, // Concept is to move all enemies when you move: gonna be a pain to do but funny if possible
-		NPCsFriendlyFire, // I have no idea how this would work, but darn would it be funny
 	};
 
 	struct ChaosEventData {
@@ -81,6 +94,7 @@ private:
 	void HandleEnableSpaceToJump(EChaosEvent eventRef);
 	void HandleWalkOnAir(EChaosEvent eventRef);
 	void HandleGive47Boosters(EChaosEvent eventRef);
+	void HandleNPCsFriendlyFire(EChaosEvent eventRef);
 
 public:
 	//--- Event Processing ---//
@@ -113,7 +127,7 @@ public:
 	void HandleWalkOnAir();
 	bool isAirWalking = false;
 	bool canAirWalk = false;
-	float maintainedZCoord;
+	float maintainedZCoord = 0;
 	//---------------------//
 
 	//--- Stuff that could be moved to a helper file at some point: ---//
@@ -154,6 +168,7 @@ public:
 			{ EChaosEvent::EnableSpaceToJump,	   {[this]() { HandleEnableSpaceToJump(EChaosEvent::EnableSpaceToJump); }, "Hit Space to Jump!", 4000} },
 			{ EChaosEvent::WalkOnAir,			   {[this]() { HandleWalkOnAir(EChaosEvent::WalkOnAir); }, "Press F to Walk on Air!", 4000} },
 			{ EChaosEvent::Give47Boosters,		   {[this]() { HandleGive47Boosters(EChaosEvent::Give47Boosters); }, "A Well-Needed Boost", 500} },
+			{ EChaosEvent::NPCsFriendlyFire,	   {[this]() { HandleNPCsFriendlyFire(EChaosEvent::NPCsFriendlyFire); }, "NPCs Can Friendly Fire", 2500} },
 			
 			// Work-in-progress effects, ordered from when I started working on them
 			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(EChaosEvent::RemoveAllWeapons); }, "Disarmed", 1} },

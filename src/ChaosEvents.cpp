@@ -33,7 +33,9 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
     // This function is called every frame while the game is in play mode.
     if (!SDK()->GetLocalPlayer())
     {
-		if (!activeEffects.empty()) {
+        linesToRender.clear();
+        
+        if (!activeEffects.empty()) {
 			activeEffects.clear();
 			counter = 0;
 			Logger::Debug("Couldn't find player, clearing effects...");
@@ -82,7 +84,7 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
     }
 
     if (Functions::ZInputAction_Digital->Call(&m_AirwalkAction, -1)) {
-        Logger::Debug("Airwalk input detected.");
+        //Logger::Debug("Airwalk input detected.");
         if (!canAirWalk) return;
 
         isAirWalking = !isAirWalking;
@@ -112,7 +114,6 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
         }
     }
 }
-
 
 void ChaosEvents::ExecuteEvent(EChaosEvent event)
 {
@@ -940,7 +941,7 @@ void ChaosEvents::HandleWalkOnAir(EChaosEvent eventRef)
 
 void ChaosEvents::HandleGive47Boosters(EChaosEvent eventRef)
 {
-    if (EventTimeElapsedIsGreaterThan(eventRef, 10)) return;
+    if (EventTimeElapsedIsGreaterThan(eventRef, 9)) return;
 
     if (m_RepositoryProps.size() == 0)
     {
@@ -962,4 +963,92 @@ void ChaosEvents::HandleGive47Boosters(EChaosEvent eventRef)
     SMatrix s_HitmanWorldMatrix = s_SpatialEntity->GetWorldMatrix();
     m_SpawnInWorld = false;
     InitiateSpawnItem(s_PropPair, s_HitmanWorldMatrix);
+}
+
+void ChaosEvents::HandleNPCsFriendlyFire(EChaosEvent eventRef)
+{
+    // get iterator eventref
+    //auto it = eventHandlers.find(eventRef);
+    //if (it != eventHandlers.end()) {
+    //    auto& eventHandler = it->second;
+    //    if (eventHandler.effectDuration % 4 == 0) {
+    //        linesToRender.clear();
+    //    }
+    //}
+    
+    for (int i = 0; i < *Globals::NextActorId; i++)
+    {
+        ZRayQueryOutput s_RayOutput{};
+
+        auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
+
+        if (!actor->IsDead())
+        {
+            SMatrix s_WorldMatrix = Globals::ActorManager->m_aActiveActors[i].m_ref.QueryInterface<ZSpatialEntity>()->GetWorldMatrix();
+            float4 s_ForwardDirection = float4(
+                -s_WorldMatrix.YAxis.x, -s_WorldMatrix.YAxis.y, -s_WorldMatrix.YAxis.z, -s_WorldMatrix.YAxis.w
+            );
+
+            float4 s_From = s_WorldMatrix.Trans;
+            float4 s_To = s_WorldMatrix.Trans;
+            s_From.z += 0.75f;
+            s_To = s_From + s_ForwardDirection * 50.0f;
+
+            if (!*Globals::CollisionManager) {
+                Logger::Error("Collision manager not found.");
+                return;
+            }
+
+            ZRayQueryInput s_RayInput{
+                .m_vFrom = s_From,
+                .m_vTo = s_To,
+            };
+
+            // Uncomment for Debug Lines:
+            //SVector3 s_FromPoint = { s_From.x, s_From.y, s_From.z };
+            //SVector3 s_ToPoint = { s_To.x, s_To.y, s_To.z };
+            //linesToRender[s_FromPoint] = s_ToPoint;
+
+            if (!(*Globals::CollisionManager)->RayCastClosestHit(s_RayInput, &s_RayOutput)) {
+                Logger::Error("Raycast failed.");
+                return;
+            }
+
+            if (s_RayOutput.m_BlockingEntity) {
+                const auto& s_Interfaces = *s_RayOutput.m_BlockingEntity->GetType()->m_pInterfaces;
+                //Logger::Trace(
+                //    "Hit entity of type '{}' with id '{:x}'.", s_Interfaces[0].m_pTypeId->typeInfo()->m_pTypeName,
+                //    s_RayOutput.m_BlockingEntity->GetType()->m_nEntityId
+                //);
+            }
+
+            auto m_SelectedEntity = s_RayOutput.m_BlockingEntity;
+
+            if (m_SelectedEntity.GetOwningEntity().HasInterface<ZCharacterTemplateAspect>()) {
+                if (ZActor* tempSelectedActor = m_SelectedEntity.GetOwningEntity().QueryInterface<ZActor>()) {
+                    if (tempSelectedActor != actor && tempSelectedActor->IsAlive())
+                    {
+                        m_SelectedEntity = tempSelectedActor->m_rCharacter.m_ref;
+                        TEntityRef<IItem> s_Item;
+                        TEntityRef<ZSetpieceEntity> s_SetPieceEntity;
+                        Logger::Debug("Killing actor: {}", tempSelectedActor->m_sActorName);
+                        Functions::ZActor_KillActor->Call(tempSelectedActor, s_Item, s_SetPieceEntity, EDamageEvent::eDE_Shoot, EDeathBehavior::eDB_IMPACT_ANIM);
+                    }
+                }
+            }
+
+            if (m_SelectedEntity.HasInterface<ZActor>()) {
+                if (ZActor* s_Actor = m_SelectedEntity.QueryInterface<ZActor>()) {
+                    if (s_Actor != actor && s_Actor->IsAlive())
+                    {
+                        m_SelectedEntity = s_Actor->m_rCharacter.m_ref;
+                        TEntityRef<IItem> s_Item;
+                        TEntityRef<ZSetpieceEntity> s_SetPieceEntity;
+                        Logger::Debug("Killing actor: {}", s_Actor->m_sActorName);
+                        Functions::ZActor_KillActor->Call(s_Actor, s_Item, s_SetPieceEntity, EDamageEvent::eDE_Shoot, EDeathBehavior::eDB_IMPACT_ANIM);
+                    }
+                }
+            }
+        }
+    }
 }

@@ -10,6 +10,7 @@ public:
     void OnDrawMenu() override;
     void OnDrawUI(bool p_HasFocus) override;
 	~ModdingTest() override;
+    void OnDraw3D(IRenderer* p_Renderer) override;
 
 private:
     DECLARE_PLUGIN_DETOUR(ModdingTest, void, OnLoadScene, ZEntitySceneContext* th, ZSceneData& p_SceneData);

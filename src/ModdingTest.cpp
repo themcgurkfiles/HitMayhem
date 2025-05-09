@@ -67,9 +67,9 @@ void ModdingTest::OnDrawMenu() {
     //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::InfiniteAmmo); }
     //}
     //
-    //if (ImGui::Button(ICON_MD_LOCK_RESET "Rand Teleport")) {
-    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Teleport47ToRandChar); }
-    //}
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Rand Teleport")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Teleport47ToRandChar); }
+    }
     //
     //if (ImGui::Button(ICON_MD_LOCK_RESET "Launch NPC")) {
     //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LaunchAllChars); }
@@ -101,6 +101,10 @@ void ModdingTest::OnDrawMenu() {
 
     if (ImGui::Button(ICON_MD_LOCK_RESET "Give 47 Boosters")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Give47Boosters); }
+    }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "NPCs Friendly Fire")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::NPCsFriendlyFire); }
     }
 }
 
@@ -145,6 +149,21 @@ ModdingTest::~ModdingTest()
 {
     const ZMemberDelegate<ChaosEvents, void(const SGameUpdateEvent&)> s_Delegate(m_ChaosEvents, &ChaosEvents::OnFrameUpdate);
     Globals::GameLoopManager->UnregisterFrameUpdate(s_Delegate, 1, EUpdateMode::eUpdatePlayMode);
+}
+
+void ModdingTest::OnDraw3D(IRenderer* p_Renderer)
+{
+	if (m_ChaosEvents) {
+        for (auto it = m_ChaosEvents->linesToRender.begin(); it != m_ChaosEvents->linesToRender.end(); ++it)
+        {
+            p_Renderer->DrawLine3D(
+                it->first,
+                it->second,
+                SVector4(1, 0, 0, 1),
+                SVector4(0, 1, 0, 1)
+            );
+        }
+	}
 }
 
 DEFINE_PLUGIN_DETOUR(ModdingTest, void, OnLoadScene, ZEntitySceneContext* th, ZSceneData& p_SceneData) {

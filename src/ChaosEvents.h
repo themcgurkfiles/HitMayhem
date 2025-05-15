@@ -27,7 +27,6 @@ public:
 	};
 	std::map<SVector3, SVector3, SVector3Less> linesToRender;
 
-	// destructor
 	~ChaosEvents();
 	
 	// The debug events may or may not be needed, at least random won't pick them.
@@ -157,26 +156,26 @@ public:
 	ChaosEvents() : m_JumpAction("Jump"), m_AirwalkAction("Airwalk") {
 		eventHandlers = {
 			// Working effects, ordered from when I got them to work
-			{ EChaosEvent::KillAura,               {[this]() { HandleKillAura(EChaosEvent::KillAura); }, "Kill Aura", 4000}},
-			{ EChaosEvent::ReviveAura,             {[this]() { HandleReviveAura(EChaosEvent::ReviveAura); }, "Revive Aura", 4000} },
-			{ EChaosEvent::InfiniteAmmo,           {[this]() { HandleInfiniteAmmo(EChaosEvent::InfiniteAmmo); }, "Infinite Ammo", 4000} },
-			{ EChaosEvent::Make47Invincible,       {[this]() { HandleMake47Invincible(EChaosEvent::Make47Invincible); }, "GODMODE!!!", 4000} },
+			{ EChaosEvent::KillAura,               {[this]() { HandleKillAura(EChaosEvent::KillAura); }, "Kill Aura", 3000}},
+			{ EChaosEvent::ReviveAura,             {[this]() { HandleReviveAura(EChaosEvent::ReviveAura); }, "Revive Aura", 3000} },
+			{ EChaosEvent::InfiniteAmmo,           {[this]() { HandleInfiniteAmmo(EChaosEvent::InfiniteAmmo); }, "Infinite Ammo", 3000} },
+			{ EChaosEvent::Make47Invincible,       {[this]() { HandleMake47Invincible(EChaosEvent::Make47Invincible); }, "GODMODE!!!", 3000} },
 			{ EChaosEvent::Teleport47ToRandChar,   {[this]() { HandleTeleport47ToRandChar(EChaosEvent::Teleport47ToRandChar); }, "Where In the World is Agent 47?", 500}},
 			{ EChaosEvent::LaunchAllChars,         {[this]() { HandleLaunchAllChars(EChaosEvent::LaunchAllChars); }, "Launch all NPCs", 100}},
-			{ EChaosEvent::Launch47,               {[this]() { HandleLaunch47(EChaosEvent::Launch47); }, "To The Moon, 47!", 1000}},
+			{ EChaosEvent::Launch47,               {[this]() { HandleLaunch47(EChaosEvent::Launch47); }, "To The Moon, 47!", 500}},
 			{ EChaosEvent::LookingGood47,          {[this]() { HandleLookingGood47(EChaosEvent::LookingGood47); }, "Looking Good, 47!", 500}},
 			{ EChaosEvent::SpawnRandomItem,		   {[this]() { HandleSpawnRandomItem(EChaosEvent::SpawnRandomItem); }, "Spawn Random Item", 500} },
 			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(EChaosEvent::SpawnFireExtinguishers); }, "Fire Extinguisher Snake", 1000} },
-			{ EChaosEvent::EnableSpaceToJump,	   {[this]() { HandleEnableSpaceToJump(EChaosEvent::EnableSpaceToJump); }, "Hit Space to Jump!", 4000} },
-			{ EChaosEvent::WalkOnAir,			   {[this]() { HandleWalkOnAir(EChaosEvent::WalkOnAir); }, "Press F to Walk on Air!", 4000} },
+			{ EChaosEvent::EnableSpaceToJump,	   {[this]() { HandleEnableSpaceToJump(EChaosEvent::EnableSpaceToJump); }, "Hit Space to Jump!", 3000} },
+			{ EChaosEvent::WalkOnAir,			   {[this]() { HandleWalkOnAir(EChaosEvent::WalkOnAir); }, "Press F to Walk on Air!", 3000} },
 			{ EChaosEvent::Give47Boosters,		   {[this]() { HandleGive47Boosters(EChaosEvent::Give47Boosters); }, "A Well-Needed Boost", 500} },
-			{ EChaosEvent::NPCsFriendlyFire,	   {[this]() { HandleNPCsFriendlyFire(EChaosEvent::NPCsFriendlyFire); }, "NPCs Can Friendly Fire", 999999} },
 			
 			// Work-in-progress effects, ordered from when I started working on them
 			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(EChaosEvent::RemoveAllWeapons); }, "Disarmed", 1} },
 			{ EChaosEvent::MakeAllNPCsInvisible, {[this]() { HandleMakeAllNPCsInvisible(EChaosEvent::MakeAllNPCsInvisible); }, "Ghost NPCs", 1000} },
 			{ EChaosEvent::MakeAllNPCsEnforcers, {[this]() { HandleMakeAllNPCsEnforcers(EChaosEvent::MakeAllNPCsEnforcers); }, "Upstanding Citizens", 1000} },
-			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(EChaosEvent::TeleportTargetsToRandomChar); }, "Random Target Teleport", 1}}
+			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(EChaosEvent::TeleportTargetsToRandomChar); }, "Random Target Teleport", 1}},
+			{ EChaosEvent::NPCsFriendlyFire,	   {[this]() { HandleNPCsFriendlyFire(EChaosEvent::NPCsFriendlyFire); }, "NPCs Can Friendly Fire", 1000} },
 		};
 	}
 };

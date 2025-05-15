@@ -121,8 +121,20 @@ ChaosEvents::~ChaosEvents()
     Logger::Debug("ChaosEvents destructor called.");
     if (m_Running) {
         m_Running = false;
-        
     }
+    
+	if (hm5CrippleBox) {
+		hm5CrippleBox->Deactivate(0);
+        delete hm5CrippleBox;
+	}
+
+	const ZMemberDelegate<ChaosEvents, void(const SGameUpdateEvent&)> s_Delegate(this, &ChaosEvents::OnFrameUpdate);
+	Globals::GameLoopManager->UnregisterFrameUpdate(s_Delegate, 1, EUpdateMode::eUpdatePlayMode);
+	activeEffects.clear();
+	eventHandlers.clear();
+	linesToRender.clear();
+	m_RepositoryProps.clear();
+	m_Running = false;
 }
 
 void ChaosEvents::ExecuteEvent(EChaosEvent event)

@@ -33,7 +33,10 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
     // This function is called every frame while the game is in play mode.
     if (!SDK()->GetLocalPlayer())
     {
-        linesToRender.clear();
+        if (!linesToRender.empty())
+        {
+            linesToRender.clear();
+        }
         
         if (!activeEffects.empty()) {
 			activeEffects.clear();

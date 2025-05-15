@@ -103,7 +103,7 @@ void ModdingTest::OnDrawMenu() {
     //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Give47Boosters); }
     //}
 
-    if (ImGui::Button(ICON_MD_LOCK_RESET "NPCs Friendly Fire")) {
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Friendly Fire")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::NPCsFriendlyFire); }
     }
 }
@@ -113,13 +113,27 @@ void ModdingTest::OnDrawUI(bool p_HasFocus) {
     
     if (SDK())
     {
-        ImGui::SetNextWindowPos(ImVec2(0, 500), ImGuiCond_Always);
-        ImGui::SetNextWindowSizeConstraints(ImVec2(80, 25), ImVec2(1500, 200));
-        ImGui::SetNextWindowBgAlpha(1.f);
-        ImGui::Begin("ChaosEvents", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar);
-        ImGui::Text("Time Until Next Effect: ");
+        // Side menu setup  
+        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);  
+        ImGui::SetNextWindowBgAlpha(1.f);  
+        ImGui::Begin("ChaosEvents", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar);  
+        ImGui::Text("HitMayhem Chaos Mod");  
+        ImGui::Text("-------------------");
+        ImGui::Text("");
+        
 		if (m_ChaosEvents)
 		{
+            // Mod processing
+            ImGui::Text("Mod Enabled: ");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1, 1, 0, 1), "%s", m_ChaosEvents->isProcessingEffects ? "True" : "False");
+            ImGui::Text("Timed Effects Enabled: ");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1, 1, 0, 1), "%s", m_ChaosEvents->isProcessingRandEffects ? "True" : "False");
+            ImGui::Text("");
+            
+            // Timer Processing
+            ImGui::Text("Time Until Next Effect: ");
             ImGui::SameLine();
             ImGui::TextColored(ImVec4(1, 1, 0, 1), "%s", std::to_string(m_ChaosEvents->counterLimit - m_ChaosEvents->counter).c_str());
             

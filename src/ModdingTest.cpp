@@ -59,9 +59,9 @@ void ModdingTest::OnDrawMenu() {
     //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::ReviveAura); }
     //}
     //
-    //if (ImGui::Button(ICON_MD_LOCK_RESET "Invincible")) {
-    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Make47Invincible); }
-    //}
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Invincible")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Make47Invincible); }
+    }
     //
     //if (ImGui::Button(ICON_MD_LOCK_RESET "Infinite Ammo")) {
     //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::InfiniteAmmo); }
@@ -83,9 +83,9 @@ void ModdingTest::OnDrawMenu() {
     //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LookingGood47); }
     //}
     //
-	//if (ImGui::Button(ICON_MD_LOCK_RESET "RandItem")) {
-	//	if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnRandomItem); }
-	//}
+	if (ImGui::Button(ICON_MD_LOCK_RESET "RandItem")) {
+		if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnRandomItem); }
+	}
     //
     //if (ImGui::Button(ICON_MD_LOCK_RESET "FireExtinguish")) {
     //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnFireExtinguishers); }

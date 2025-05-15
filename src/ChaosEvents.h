@@ -26,6 +26,9 @@ public:
 		}
 	};
 	std::map<SVector3, SVector3, SVector3Less> linesToRender;
+
+	// destructor
+	~ChaosEvents();
 	
 	// The debug events may or may not be needed, at least random won't pick them.
 	enum class EChaosEvent { 
@@ -43,12 +46,11 @@ public:
 		LookingGood47,
 		WalkOnAir,
 		Give47Boosters,
-		NPCsFriendlyFire, // I have no idea how this would work, but darn would it be funny
 		//
 		DebugSampleLastEvent,   // Do not assign
 
-
 		// Unused effects for now (work in progress)
+		NPCsFriendlyFire, // I have no idea how this would work, but darn would it be funny
 		LaunchAllChars, // TODO: FIX THIS EFFECT, IT WORKS BUT THE NPCS DON'T EVER GET UP!
 		RemoveAllWeapons,
 		MakeAllNPCsInvisible,
@@ -168,7 +170,7 @@ public:
 			{ EChaosEvent::EnableSpaceToJump,	   {[this]() { HandleEnableSpaceToJump(EChaosEvent::EnableSpaceToJump); }, "Hit Space to Jump!", 4000} },
 			{ EChaosEvent::WalkOnAir,			   {[this]() { HandleWalkOnAir(EChaosEvent::WalkOnAir); }, "Press F to Walk on Air!", 4000} },
 			{ EChaosEvent::Give47Boosters,		   {[this]() { HandleGive47Boosters(EChaosEvent::Give47Boosters); }, "A Well-Needed Boost", 500} },
-			{ EChaosEvent::NPCsFriendlyFire,	   {[this]() { HandleNPCsFriendlyFire(EChaosEvent::NPCsFriendlyFire); }, "NPCs Can Friendly Fire", 2500} },
+			{ EChaosEvent::NPCsFriendlyFire,	   {[this]() { HandleNPCsFriendlyFire(EChaosEvent::NPCsFriendlyFire); }, "NPCs Can Friendly Fire", 999999} },
 			
 			// Work-in-progress effects, ordered from when I started working on them
 			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(EChaosEvent::RemoveAllWeapons); }, "Disarmed", 1} },

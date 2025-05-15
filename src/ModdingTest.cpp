@@ -83,9 +83,9 @@ void ModdingTest::OnDrawMenu() {
     //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LookingGood47); }
     //}
     //
-	if (ImGui::Button(ICON_MD_LOCK_RESET "RandItem")) {
-		if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnRandomItem); }
-	}
+	//if (ImGui::Button(ICON_MD_LOCK_RESET "RandItem")) {
+	//	if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnRandomItem); }
+	//}
     //
     //if (ImGui::Button(ICON_MD_LOCK_RESET "FireExtinguish")) {
     //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnFireExtinguishers); }
@@ -99,9 +99,9 @@ void ModdingTest::OnDrawMenu() {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::WalkOnAir); }
     }
 
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Give 47 Boosters")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Give47Boosters); }
-    }
+    //if (ImGui::Button(ICON_MD_LOCK_RESET "Give 47 Boosters")) {
+    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Give47Boosters); }
+    //}
 
     if (ImGui::Button(ICON_MD_LOCK_RESET "NPCs Friendly Fire")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::NPCsFriendlyFire); }
@@ -147,8 +147,13 @@ void ModdingTest::OnDrawUI(bool p_HasFocus) {
 
 ModdingTest::~ModdingTest()
 {
-    const ZMemberDelegate<ChaosEvents, void(const SGameUpdateEvent&)> s_Delegate(m_ChaosEvents, &ChaosEvents::OnFrameUpdate);
-    Globals::GameLoopManager->UnregisterFrameUpdate(s_Delegate, 1, EUpdateMode::eUpdatePlayMode);
+    if (m_ChaosEvents)
+    {
+        const ZMemberDelegate<ChaosEvents, void(const SGameUpdateEvent&)> s_Delegate(m_ChaosEvents, &ChaosEvents::OnFrameUpdate);
+        Globals::GameLoopManager->UnregisterFrameUpdate(s_Delegate, 1, EUpdateMode::eUpdatePlayMode);
+
+        delete m_ChaosEvents;
+    }
 }
 
 void ModdingTest::OnDraw3D(IRenderer* p_Renderer)

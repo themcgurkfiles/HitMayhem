@@ -55,6 +55,10 @@ void ModdingTest::OnDrawMenu() {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::BecomeTheKashmirian); }
     }
 
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Spawn John Hitman")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::SpawnJohnHitman); }
+    }
+
     //if (ImGui::Button(ICON_MD_LOCK_RESET "Kill Aura")) {
     //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::KillAura); }
     //}

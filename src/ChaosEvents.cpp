@@ -484,15 +484,64 @@ void ChaosEvents::InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> 
     }
 }
 
-auto ChaosEvents::SpawnNPC(
-    const std::string& p_NpcName,
-    const ZRepositoryID& repositoryID,
-    const TEntityRef<ZGlobalOutfitKit>* p_GlobalOutfitKit,
-    uint8_t n_CurrentCharacterSetIndex,
-    const std::string& s_CurrentcharSetCharacterType,
-    uint8_t n_CurrentOutfitVariationIndex
-) -> void {
-    
+ZActor* ChaosEvents::SpawnNPC(const std::string& s_NpcName, const ZRepositoryID& repositoryID, const TEntityRef<ZGlobalOutfitKit>* p_GlobalOutfitKit, uint8_t n_CurrentCharacterSetIndex, const std::string& s_CurrentcharSetCharacterType, uint8_t p_CurrentOutfitVariationIndex)
+{
+    const auto s_Scene = Globals::Hitman5Module->m_pEntitySceneContext->m_pScene;
+
+    if (!s_Scene) {
+        Logger::Debug("Scene not loaded.");
+        return nullptr;
+    }
+
+    const auto s_RuntimeResourceId = ResId<
+        "[assembly:/templates/gameplay/ai2/actors.template?/npcactor.entitytemplate].pc_entitytype">;
+
+    TResourcePtr<ZTemplateEntityFactory> s_Resource;
+    Globals::ResourceManager->GetResourcePtr(s_Resource, s_RuntimeResourceId, 0);
+
+    if (!s_Resource) {
+        Logger::Debug("Resource is not loaded.");
+        return nullptr;
+    }
+
+    ZEntityRef s_NewEntity;
+    Functions::ZEntityManager_NewEntity->Call(
+        Globals::EntityManager, s_NewEntity, "", s_Resource, s_Scene.m_ref, nullptr, -1
+    );
+
+    if (!s_NewEntity) {
+        Logger::Debug("Could not spawn entity.");
+        return nullptr;
+    }
+
+    auto s_LocalHitman = SDK()->GetLocalPlayer();
+
+    if (!s_LocalHitman) {
+        Logger::Debug("No local hitman.");
+        return nullptr;
+    }
+
+    ZActor* actor = s_NewEntity.QueryInterface<ZActor>();
+
+    actor->m_sActorName = s_NpcName;
+    actor->m_bStartEnabled = true;
+    actor->m_nOutfitCharset = n_CurrentCharacterSetIndex;
+    actor->m_nOutfitVariation = p_CurrentOutfitVariationIndex;
+    actor->m_OutfitRepositoryID = repositoryID;
+    actor->m_eRequiredVoiceVariation = EActorVoiceVariation::eAVV_Undefined;
+
+    actor->Activate(0);
+
+    ZSpatialEntity* s_ActorSpatialEntity = s_NewEntity.QueryInterface<ZSpatialEntity>();
+    ZSpatialEntity* s_HitmanSpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
+
+    s_ActorSpatialEntity->SetWorldMatrix(s_HitmanSpatialEntity->GetWorldMatrix());
+
+    if (p_GlobalOutfitKit) {
+        Functions::ZActor_SetOutfit->Call(actor, *p_GlobalOutfitKit, n_CurrentCharacterSetIndex, p_CurrentOutfitVariationIndex, false);
+    }
+
+    return actor;
 }
 
 void ChaosEvents::ActivateJump()
@@ -1118,5 +1167,53 @@ void ChaosEvents::BecomeTheKashmirian(EChaosEvent eventRef)
         SMatrix s_HitmanWorldMatrix = s_SpatialEntity->GetWorldMatrix();
         m_SpawnInWorld = false;
         InitiateSpawnItem(s_PropPair, s_HitmanWorldMatrix);
+    }
+}
+
+void ChaosEvents::SpawnJohnHitman(EChaosEvent eventRef)
+{
+    if (!EventJustStarted(eventRef))
+        return;
+    
+    static TEntityRef<ZGlobalOutfitKit>* s_GlobalOutfitKit;
+    ZContentKitManager* s_ContentKitManager = Globals::ContentKitManager;
+    size_t s_RandomIndex = std::rand() % s_ContentKitManager->m_repositoryGlobalOutfitKits.size();
+    int s_CurrentIndex = 0;
+    for (auto it = s_ContentKitManager->m_repositoryGlobalOutfitKits.begin(); it != s_ContentKitManager->m_repositoryGlobalOutfitKits.end(); ++it) {
+        if (s_CurrentIndex == s_RandomIndex) {
+            s_GlobalOutfitKit = &it->second;
+        }
+        ++s_CurrentIndex;
+    }
+
+	static std::string s_RepositoryName = "John Hitman";
+    static ZRepositoryID s_RepositoryId = ZRepositoryID("");
+    static uint8_t n_CurrentCharacterSetIndex = 0;
+    static std::string s_CurrentcharSetCharacterType = "HeroA";
+    static uint8_t n_CurrentOutfitVariationIndex = 0;
+    
+    auto* spawnedActor = SpawnNPC(
+        s_RepositoryName,
+		s_RepositoryId,
+		s_GlobalOutfitKit,
+		n_CurrentCharacterSetIndex,
+		s_CurrentcharSetCharacterType,
+		n_CurrentOutfitVariationIndex
+	);
+
+	spawnedActor->m_bStartEnabled = true;
+
+    auto s_LocalHitman = SDK()->GetLocalPlayer();
+    auto s_SpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
+    SMatrix s_HitmanWorldMatrix = s_SpatialEntity->GetWorldMatrix();
+
+    for (int i = 0; i < *Globals::NextActorId; i++)
+    {
+        auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
+        auto& actorName = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef->m_sActorName;
+        if (actorName == spawnedActor->m_sActorName)
+        {
+            Logger::Debug("{} HAS SPAWNED!", actorName);
+        }
     }
 }

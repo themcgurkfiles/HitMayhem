@@ -46,12 +46,14 @@ public:
 		LookingGood47,
 		WalkOnAir,
 		Give47Boosters,
+		BecomeTheKashmirian,
 		//
 		DebugSampleLastEvent,   // Do not assign
 
 		// Unused effects for now (work in progress)
 		NPCsFriendlyFire, // Currently broken and borked beyond belief, just trying to test raycast stuff
 		LaunchAllChars, // TODO: FIX THIS EFFECT, IT WORKS BUT THE NPCS DON'T EVER GET UP!
+		SpawnJohnHitman, // Just plain don't work, sadge
 		RemoveAllWeapons,
 		MakeAllNPCsInvisible,
 		MakeAllNPCsEnforcers,
@@ -61,7 +63,6 @@ public:
 
 		// Concepts (no funcs made)
 		Hivemind, // Concept is to move all enemies when you move: gonna be a pain to do but funny if possible
-		BecomeTheKashmirian, // Give 47 the Constant's disguise and sniper
 		YouGotTheWholeSquadLaughing, // All NPCs turn to 47 and possibly laugh at him
 		MyMainGoalIsToBlowUp, // Bind an explode event to a revive event (static EngineFunction<void(ZActor* th)>* ZActor_ReviveActor; in Functions.h)
 	};
@@ -101,6 +102,7 @@ private:
 	void HandleGive47Boosters(EChaosEvent eventRef);
 	void HandleNPCsFriendlyFire(EChaosEvent eventRef);
 	void BecomeTheKashmirian(EChaosEvent eventRef);
+	void SpawnJohnHitman(EChaosEvent eventRef);
 
 public:
 	//--- Event Processing ---//
@@ -144,7 +146,7 @@ public:
 	std::pair<const std::string, ZRepositoryID> GetRepositoryPropFromName(std::string itemName);
 	void InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> s_PropPair, ZSpatialEntity* s_SpatialEntity);
 	void InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> s_PropPair, SMatrix& s_PositionMatrix);
-	static void SpawnNPC(
+	ZActor* SpawnNPC(
 		const std::string& s_NpcName, const ZRepositoryID& repositoryID,
 		const TEntityRef<ZGlobalOutfitKit>* p_GlobalOutfitKit, uint8_t n_CurrentCharacterSetIndex,
 		const std::string& s_CurrentcharSetCharacterType, uint8_t p_CurrentOutfitVariationIndex
@@ -179,6 +181,7 @@ public:
 			{ EChaosEvent::EnableSpaceToJump,	   {[this]() { HandleEnableSpaceToJump(EChaosEvent::EnableSpaceToJump); }, "Hit Space to Jump!", 3000} },
 			{ EChaosEvent::WalkOnAir,			   {[this]() { HandleWalkOnAir(EChaosEvent::WalkOnAir); }, "Press F to Walk on Air!", 3000} },
 			{ EChaosEvent::Give47Boosters,		   {[this]() { HandleGive47Boosters(EChaosEvent::Give47Boosters); }, "A Well-Needed Boost", 500} },
+			{ EChaosEvent::BecomeTheKashmirian,	   {[this]() { BecomeTheKashmirian(EChaosEvent::BecomeTheKashmirian); }, "Become 'The Kashmirian'", 500} },
 			
 			// Work-in-progress effects, ordered from when I started working on them
 			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(EChaosEvent::RemoveAllWeapons); }, "Disarmed", 1} },
@@ -186,7 +189,7 @@ public:
 			{ EChaosEvent::MakeAllNPCsEnforcers, {[this]() { HandleMakeAllNPCsEnforcers(EChaosEvent::MakeAllNPCsEnforcers); }, "Upstanding Citizens", 1000} },
 			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(EChaosEvent::TeleportTargetsToRandomChar); }, "Random Target Teleport", 1}},
 			{ EChaosEvent::NPCsFriendlyFire,	   {[this]() { HandleNPCsFriendlyFire(EChaosEvent::NPCsFriendlyFire); }, "NPCs Can Friendly Fire", 1000} },
-			{ EChaosEvent::BecomeTheKashmirian,	   {[this]() { BecomeTheKashmirian(EChaosEvent::BecomeTheKashmirian); }, "Become 'The Kashmirian'", 500} },
+			{ EChaosEvent::SpawnJohnHitman,			   {[this]() { SpawnJohnHitman(EChaosEvent::SpawnJohnHitman); }, "Spawn an NPC", 500} },
 		};
 	}
 };

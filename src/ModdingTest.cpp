@@ -99,9 +99,9 @@ void ModdingTest::OnDrawMenu() {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::WalkOnAir); }
     }
 
-    //if (ImGui::Button(ICON_MD_LOCK_RESET "Give 47 Boosters")) {
-    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Give47Boosters); }
-    //}
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Give 47 Boosters")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Give47Boosters); }
+    }
 
     if (ImGui::Button(ICON_MD_LOCK_RESET "Friendly Fire")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::NPCsFriendlyFire); }
@@ -113,12 +113,13 @@ void ModdingTest::OnDrawUI(bool p_HasFocus) {
     
     if (SDK())
     {
-        // Side menu setup  
-        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);  
-        ImGui::SetNextWindowBgAlpha(1.f);  
+        // Side menu setup
+        //ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);  
+        ImGui::SetNextWindowPos(ImVec2(0, (s_ImgGuiIO.DisplaySize.y / 2)), ImGuiCond_Always);
+        ImGui::SetNextWindowBgAlpha(0.80f);  
         ImGui::Begin("ChaosEvents", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar);  
         ImGui::Text("HitMayhem Chaos Mod");  
-        ImGui::Text("-------------------");
+        ImGui::Text("--------------------------------------");
         ImGui::Text("");
         
 		if (m_ChaosEvents)

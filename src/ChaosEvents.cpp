@@ -33,16 +33,11 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
     // This function is called every frame while the game is in play mode.
     if (!SDK()->GetLocalPlayer())
     {
-        if (!linesToRender.empty())
+        if (!activeEffects.empty())
         {
-            linesToRender.clear();
+            ResetChaosData();
+            Logger::Debug("Couldn't find player, clearing effects...");
         }
-        
-        if (!activeEffects.empty()) {
-			activeEffects.clear();
-			counter = 0;
-			Logger::Debug("Couldn't find player, clearing effects...");
-		}
         return;
     }
 
@@ -58,8 +53,6 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
             counter = 0;
         }
     }
-
-    //Logger::Debug("Counter: {}", counter);
 
     for (auto it = activeEffects.begin(); it != activeEffects.end(); ) {
         auto& effect = it->second;
@@ -119,25 +112,31 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
     }
 }
 
-ChaosEvents::~ChaosEvents()
+void ChaosEvents::ResetChaosData()
 {
     Logger::Debug("ChaosEvents destructor called.");
-    if (m_Running) {
-        m_Running = false;
-    }
-    
-	if (hm5CrippleBox) {
-		hm5CrippleBox->Deactivate(0);
-        delete hm5CrippleBox;
-	}
 
-	const ZMemberDelegate<ChaosEvents, void(const SGameUpdateEvent&)> s_Delegate(this, &ChaosEvents::OnFrameUpdate);
-	Globals::GameLoopManager->UnregisterFrameUpdate(s_Delegate, 1, EUpdateMode::eUpdatePlayMode);
-	activeEffects.clear();
-	eventHandlers.clear();
-	linesToRender.clear();
-	m_RepositoryProps.clear();
-	m_Running = false;
+    if (hm5CrippleBox) {
+        hm5CrippleBox->Deactivate(0);
+        delete hm5CrippleBox;
+        hm5CrippleBox = nullptr;
+    }
+
+    counter = 0;
+    activeEffects.clear();
+    eventHandlers.clear();
+    linesToRender.clear();
+    m_RepositoryProps.clear();
+    m_Running = false;
+    canJump = false;
+    isJumping = false;
+    isAirWalking = false;
+    canAirWalk = false;
+}
+
+ChaosEvents::~ChaosEvents()
+{
+    ResetChaosData();
 }
 
 void ChaosEvents::ExecuteEvent(EChaosEvent event)
@@ -1018,9 +1017,9 @@ void ChaosEvents::HandleNPCsFriendlyFire(EChaosEvent eventRef)
         };
 
         // Uncomment for Debug Lines:
-        //SVector3 s_FromPoint = { s_From.x, s_From.y, s_From.z };
-        //SVector3 s_ToPoint = { s_To.x, s_To.y, s_To.z };
-        //linesToRender[s_FromPoint] = s_ToPoint;
+        SVector3 s_FromPoint = { s_From.x, s_From.y, s_From.z };
+        SVector3 s_ToPoint = { s_To.x, s_To.y, s_To.z };
+        linesToRender[s_FromPoint] = s_ToPoint;
 
         if (!(*Globals::CollisionManager)->RayCastClosestHit(s_RayInput, &s_RayOutput)) {
             Logger::Error("Raycast failed.");

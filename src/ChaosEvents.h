@@ -27,6 +27,7 @@ public:
 	};
 	std::map<SVector3, SVector3, SVector3Less> linesToRender;
 
+	void ResetChaosData();
 	~ChaosEvents();
 	
 	// The debug events may or may not be needed, at least random won't pick them.
@@ -49,7 +50,7 @@ public:
 		DebugSampleLastEvent,   // Do not assign
 
 		// Unused effects for now (work in progress)
-		NPCsFriendlyFire, // I have no idea how this would work, but darn would it be funny
+		NPCsFriendlyFire, // Currently broken and borked beyond belief, just trying to test raycast stuff
 		LaunchAllChars, // TODO: FIX THIS EFFECT, IT WORKS BUT THE NPCS DON'T EVER GET UP!
 		RemoveAllWeapons,
 		MakeAllNPCsInvisible,

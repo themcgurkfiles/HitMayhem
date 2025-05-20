@@ -61,6 +61,9 @@ public:
 
 		// Concepts (no funcs made)
 		Hivemind, // Concept is to move all enemies when you move: gonna be a pain to do but funny if possible
+		BecomeTheKashmirian, // Give 47 the Constant's disguise and sniper
+		YouGotTheWholeSquadLaughing, // All NPCs turn to 47 and possibly laugh at him
+		MyMainGoalIsToBlowUp, // Bind an explode event to a revive event (static EngineFunction<void(ZActor* th)>* ZActor_ReviveActor; in Functions.h)
 	};
 
 	struct ChaosEventData {
@@ -97,6 +100,7 @@ private:
 	void HandleWalkOnAir(EChaosEvent eventRef);
 	void HandleGive47Boosters(EChaosEvent eventRef);
 	void HandleNPCsFriendlyFire(EChaosEvent eventRef);
+	void BecomeTheKashmirian(EChaosEvent eventRef);
 
 public:
 	//--- Event Processing ---//
@@ -140,6 +144,11 @@ public:
 	std::pair<const std::string, ZRepositoryID> GetRepositoryPropFromName(std::string itemName);
 	void InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> s_PropPair, ZSpatialEntity* s_SpatialEntity);
 	void InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> s_PropPair, SMatrix& s_PositionMatrix);
+	static void SpawnNPC(
+		const std::string& s_NpcName, const ZRepositoryID& repositoryID,
+		const TEntityRef<ZGlobalOutfitKit>* p_GlobalOutfitKit, uint8_t n_CurrentCharacterSetIndex,
+		const std::string& s_CurrentcharSetCharacterType, uint8_t p_CurrentOutfitVariationIndex
+	);
 	bool m_Running = false;
 	bool m_ShowMessage = false;
 	bool m_SpawnInWorld = true;
@@ -177,6 +186,7 @@ public:
 			{ EChaosEvent::MakeAllNPCsEnforcers, {[this]() { HandleMakeAllNPCsEnforcers(EChaosEvent::MakeAllNPCsEnforcers); }, "Upstanding Citizens", 1000} },
 			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(EChaosEvent::TeleportTargetsToRandomChar); }, "Random Target Teleport", 1}},
 			{ EChaosEvent::NPCsFriendlyFire,	   {[this]() { HandleNPCsFriendlyFire(EChaosEvent::NPCsFriendlyFire); }, "NPCs Can Friendly Fire", 1000} },
+			{ EChaosEvent::BecomeTheKashmirian,	   {[this]() { BecomeTheKashmirian(EChaosEvent::BecomeTheKashmirian); }, "Become 'The Kashmirian'", 500} },
 		};
 	}
 };

@@ -51,6 +51,10 @@ void ModdingTest::OnDrawMenu() {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteRandomEvent(); }
     }
 
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Kashmirian Cosplay")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::BecomeTheKashmirian); }
+    }
+
     //if (ImGui::Button(ICON_MD_LOCK_RESET "Kill Aura")) {
     //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::KillAura); }
     //}

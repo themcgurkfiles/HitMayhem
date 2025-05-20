@@ -124,9 +124,7 @@ void ChaosEvents::ResetChaosData()
 
     counter = 0;
     activeEffects.clear();
-    eventHandlers.clear();
     linesToRender.clear();
-    m_RepositoryProps.clear();
     m_Running = false;
     canJump = false;
     isJumping = false;
@@ -137,6 +135,10 @@ void ChaosEvents::ResetChaosData()
 ChaosEvents::~ChaosEvents()
 {
     ResetChaosData();
+
+    // Only clear these values on destruct
+    eventHandlers.clear();
+    m_RepositoryProps.clear();
 }
 
 void ChaosEvents::ExecuteEvent(EChaosEvent event)
@@ -480,6 +482,17 @@ void ChaosEvents::InitiateSpawnItem(std::pair<const std::string, ZRepositoryID> 
         TArray<ZRepositoryID> s_ModifierIds;
         Functions::ZCharacterSubcontrollerInventory_AddDynamicItemToInventory->Call(s_Inventory, s_PropPair.second, "", &s_ModifierIds, 2);
     }
+}
+
+auto ChaosEvents::SpawnNPC(
+    const std::string& p_NpcName,
+    const ZRepositoryID& repositoryID,
+    const TEntityRef<ZGlobalOutfitKit>* p_GlobalOutfitKit,
+    uint8_t n_CurrentCharacterSetIndex,
+    const std::string& s_CurrentcharSetCharacterType,
+    uint8_t n_CurrentOutfitVariationIndex
+) -> void {
+    
 }
 
 void ChaosEvents::ActivateJump()
@@ -965,7 +978,7 @@ void ChaosEvents::HandleWalkOnAir(EChaosEvent eventRef)
 
 void ChaosEvents::HandleGive47Boosters(EChaosEvent eventRef)
 {
-    if (EventTimeElapsedIsGreaterThan(eventRef, 9)) return;
+    if (EventTimeElapsedIsGreaterThan(eventRef, 2)) return;
 
     if (m_RepositoryProps.size() == 0)
     {
@@ -1066,5 +1079,44 @@ void ChaosEvents::HandleNPCsFriendlyFire(EChaosEvent eventRef)
                 }
             }
         }
+    }
+}
+
+void ChaosEvents::BecomeTheKashmirian(EChaosEvent eventRef)
+{
+	if (!EventJustStarted(eventRef))
+		return;
+
+    if (m_RepositoryProps.size() == 0)
+    {
+        LoadRepositoryProps();
+    }
+    
+    auto s_LocalHitman = SDK()->GetLocalPlayer();
+    ZContentKitManager* s_ContentKitManager = Globals::ContentKitManager;
+    for (auto it = s_ContentKitManager->m_repositoryGlobalOutfitKits.begin(); it != s_ContentKitManager->m_repositoryGlobalOutfitKits.end(); ++it)
+    {
+        if (it->second.m_pInterfaceRef->m_sTitle == "Kashmirian")
+        {
+            Logger::Debug("Outfit: {}", (it->second.m_pInterfaceRef->m_sTitle));
+            Functions::ZHitman5_SetOutfit->Call(
+                s_LocalHitman.m_pInterfaceRef,
+                it->second, 0, 1, false, false
+            );
+        }
+    }
+
+    auto s_PropPair = GetRepositoryPropFromName("Druzhina");
+
+    if (s_PropPair.second == ZRepositoryID("")) {
+        Logger::Error("Druzhina 34 not found in repository.");
+    }
+
+    else
+    {
+        auto s_SpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
+        SMatrix s_HitmanWorldMatrix = s_SpatialEntity->GetWorldMatrix();
+        m_SpawnInWorld = false;
+        InitiateSpawnItem(s_PropPair, s_HitmanWorldMatrix);
     }
 }

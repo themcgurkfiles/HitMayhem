@@ -51,6 +51,10 @@ void ModdingTest::OnDrawMenu() {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteRandomEvent(); }
     }
 
+    if (ImGui::Button(ICON_MD_LOCK_RESET "I GOT STUCK! (Teleport to Rand Char")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Teleport47ToRandChar); }
+    }
+
     if (ImGui::Button(ICON_MD_LOCK_RESET "Kashmirian Cosplay")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::BecomeTheKashmirian); }
     }
@@ -70,14 +74,11 @@ void ModdingTest::OnDrawMenu() {
     if (ImGui::Button(ICON_MD_LOCK_RESET "Invincible")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Make47Invincible); }
     }
-    //
-    //if (ImGui::Button(ICON_MD_LOCK_RESET "Infinite Ammo")) {
-    //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::InfiniteAmmo); }
-    //}
-    //
-    if (ImGui::Button(ICON_MD_LOCK_RESET "Rand Teleport")) {
-        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::Teleport47ToRandChar); }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Infinite Ammo")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::InfiniteAmmo); }
     }
+
     //
     //if (ImGui::Button(ICON_MD_LOCK_RESET "Launch NPC")) {
     //    if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::LaunchAllChars); }
@@ -196,8 +197,13 @@ void ModdingTest::OnDraw3D(IRenderer* p_Renderer)
 
 DEFINE_PLUGIN_DETOUR(ModdingTest, void, OnLoadScene, ZEntitySceneContext* th, ZSceneData& p_SceneData) {
     Logger::Debug("Loading scene: {}", p_SceneData.m_sceneName);
-    m_ChaosEvents->m_LastLoadedScene = &p_SceneData;
-	m_ChaosEvents->m_LastLoadedSceneContext = th;
+
+    if (m_ChaosEvents->m_LastLoadedScene && m_ChaosEvents->m_LastLoadedSceneContext)
+    {
+        m_ChaosEvents->m_LastLoadedScene = &p_SceneData;
+        m_ChaosEvents->m_LastLoadedSceneContext = th;
+    }
+
     return HookResult<void>(HookAction::Continue());
 }
 

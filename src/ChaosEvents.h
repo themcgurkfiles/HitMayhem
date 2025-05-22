@@ -57,7 +57,7 @@ public:
 		RemoveAllWeapons,
 		MakeAllNPCsInvisible,
 		MakeAllNPCsEnforcers,
-		TeleportTargetsToRandomChar,
+		TeleportTargetRanChar,
 		SpawnRubberDucks,
 		SpawnRandomExplosions,
 
@@ -170,26 +170,28 @@ public:
 			// Working effects, ordered from when I got them to work
 			{ EChaosEvent::KillAura,               {[this]() { HandleKillAura(EChaosEvent::KillAura); }, "Kill Aura", 3000}},
 			{ EChaosEvent::ReviveAura,             {[this]() { HandleReviveAura(EChaosEvent::ReviveAura); }, "Revive Aura", 3000} },
-			{ EChaosEvent::InfiniteAmmo,           {[this]() { HandleInfiniteAmmo(EChaosEvent::InfiniteAmmo); }, "Infinite Ammo", 3000} },
 			{ EChaosEvent::Make47Invincible,       {[this]() { HandleMake47Invincible(EChaosEvent::Make47Invincible); }, "GODMODE!!!", 3000} },
-			{ EChaosEvent::Teleport47ToRandChar,   {[this]() { HandleTeleport47ToRandChar(EChaosEvent::Teleport47ToRandChar); }, "Where In the World is Agent 47?", 500}},
-			{ EChaosEvent::LaunchAllChars,         {[this]() { HandleLaunchAllChars(EChaosEvent::LaunchAllChars); }, "Launch all NPCs", 100}},
+			{ EChaosEvent::Teleport47ToRandChar,   {[this]() { HandleTeleport47ToRandChar(EChaosEvent::Teleport47ToRandChar); }, "Where In the World is Agent 47?", 1000}},
 			{ EChaosEvent::Launch47,               {[this]() { HandleLaunch47(EChaosEvent::Launch47); }, "To The Moon, 47!", 500}},
-			{ EChaosEvent::LookingGood47,          {[this]() { HandleLookingGood47(EChaosEvent::LookingGood47); }, "Looking Good, 47!", 500}},
-			{ EChaosEvent::SpawnRandomItem,		   {[this]() { HandleSpawnRandomItem(EChaosEvent::SpawnRandomItem); }, "Spawn Random Item", 500} },
+			{ EChaosEvent::LookingGood47,          {[this]() { HandleLookingGood47(EChaosEvent::LookingGood47); }, "Looking Good, 47!", 1000}},
+			{ EChaosEvent::SpawnRandomItem,		   {[this]() { HandleSpawnRandomItem(EChaosEvent::SpawnRandomItem); }, "Spawn Random Item", 1000} },
 			{ EChaosEvent::SpawnFireExtinguishers, {[this]() { HandleSpawnFireExtinguishers(EChaosEvent::SpawnFireExtinguishers); }, "Fire Extinguisher Snake", 1000} },
 			{ EChaosEvent::EnableSpaceToJump,	   {[this]() { HandleEnableSpaceToJump(EChaosEvent::EnableSpaceToJump); }, "Hit Space to Jump!", 3000} },
 			{ EChaosEvent::WalkOnAir,			   {[this]() { HandleWalkOnAir(EChaosEvent::WalkOnAir); }, "Press F to Walk on Air!", 3000} },
-			{ EChaosEvent::Give47Boosters,		   {[this]() { HandleGive47Boosters(EChaosEvent::Give47Boosters); }, "A Well-Needed Boost", 500} },
-			{ EChaosEvent::BecomeTheKashmirian,	   {[this]() { BecomeTheKashmirian(EChaosEvent::BecomeTheKashmirian); }, "Become 'The Kashmirian'", 500} },
+			{ EChaosEvent::Give47Boosters,		   {[this]() { HandleGive47Boosters(EChaosEvent::Give47Boosters); }, "A Well-Needed Boost", 1000} },
+			{ EChaosEvent::BecomeTheKashmirian,	   {[this]() { BecomeTheKashmirian(EChaosEvent::BecomeTheKashmirian); }, "Become 'The Kashmirian'", 1000} },
+			{ EChaosEvent::InfiniteAmmo,           {[this]() { HandleInfiniteAmmo(EChaosEvent::InfiniteAmmo); }, "Infinite Ammo", 3000} },
 			
+			// Cut effects that work but have problems
+			{ EChaosEvent::LaunchAllChars,         {[this]() { HandleLaunchAllChars(EChaosEvent::LaunchAllChars); }, "Launch all NPCs", 100}},
+
 			// Work-in-progress effects, ordered from when I started working on them
-			{ EChaosEvent::RemoveAllWeapons, {[this]() { HandleRemoveAllWeapons(EChaosEvent::RemoveAllWeapons); }, "Disarmed", 1} },
-			{ EChaosEvent::MakeAllNPCsInvisible, {[this]() { HandleMakeAllNPCsInvisible(EChaosEvent::MakeAllNPCsInvisible); }, "Ghost NPCs", 1000} },
-			{ EChaosEvent::MakeAllNPCsEnforcers, {[this]() { HandleMakeAllNPCsEnforcers(EChaosEvent::MakeAllNPCsEnforcers); }, "Upstanding Citizens", 1000} },
-			{ EChaosEvent::TeleportTargetsToRandomChar, {[this]() { HandleTeleportTargetsToRandomChar(EChaosEvent::TeleportTargetsToRandomChar); }, "Random Target Teleport", 1}},
+			{ EChaosEvent::RemoveAllWeapons,	   {[this]() { HandleRemoveAllWeapons(EChaosEvent::RemoveAllWeapons); }, "Disarmed", 1} },
+			{ EChaosEvent::MakeAllNPCsInvisible,   {[this]() { HandleMakeAllNPCsInvisible(EChaosEvent::MakeAllNPCsInvisible); }, "Ghost NPCs", 1000} },
+			{ EChaosEvent::MakeAllNPCsEnforcers,   {[this]() { HandleMakeAllNPCsEnforcers(EChaosEvent::MakeAllNPCsEnforcers); }, "Upstanding Citizens", 1000} },
+			{ EChaosEvent::TeleportTargetRanChar,  {[this]() { HandleTeleportTargetsToRandomChar(EChaosEvent::TeleportTargetRanChar); }, "Random Target Teleport", 1}},
 			{ EChaosEvent::NPCsFriendlyFire,	   {[this]() { HandleNPCsFriendlyFire(EChaosEvent::NPCsFriendlyFire); }, "NPCs Can Friendly Fire", 1000} },
-			{ EChaosEvent::SpawnJohnHitman,			   {[this]() { SpawnJohnHitman(EChaosEvent::SpawnJohnHitman); }, "Spawn an NPC", 500} },
+			{ EChaosEvent::SpawnJohnHitman,		   {[this]() { SpawnJohnHitman(EChaosEvent::SpawnJohnHitman); }, "Spawn an NPC", 500} },
 		};
 	}
 };

@@ -31,8 +31,8 @@
 
 void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
     // This function is called every frame while the game is in play mode.
-    if (!SDK()->GetLocalPlayer())
-    {
+    auto localPlayer = SDK()->GetLocalPlayer();
+    if (!localPlayer) {
         if (!activeEffects.empty())
         {
             ResetChaosData();
@@ -56,13 +56,14 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
 
     for (auto it = activeEffects.begin(); it != activeEffects.end(); ) {
         auto& effect = it->second;
+
         if (effect.isEffectActive) {
             if (effect.effectDuration <= 0) {
                 effect.isEffectActive = false;
                 Logger::Debug("Effect '{}' has ended.", it->second.effectName);
                 it = activeEffects.erase(it);  // erase returns a valid next iterator
                 continue;
-            } else {
+            } else if (effect.effectFunction) {
                 effect.effectFunction();
                 effect.effectDuration -= p_UpdateEvent.m_GameTimeDelta.ToSeconds();
                 if (effect.justStarted)
@@ -77,13 +78,14 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
 
     if (Functions::ZInputAction_Digital->Call(&m_JumpAction, -1)) {
         //Logger::Debug("Jump input detected.");
-        ActivateJump();
+		if (canJump && !isJumping) {
+            ActivateJump();
+		}
     }
 
     if (Functions::ZInputAction_Digital->Call(&m_AirwalkAction, -1)) {
         //Logger::Debug("Airwalk input detected.");
         if (!canAirWalk) return;
-
         isAirWalking = !isAirWalking;
 
         auto s_LocalHitman = SDK()->GetLocalPlayer();
@@ -91,6 +93,7 @@ void ChaosEvents::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
             Logger::Error("No local hitman.");
             return;
         }
+
         auto s_SpatialEntity = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
         SMatrix s_HitmanWorldMatrix = s_SpatialEntity->GetWorldMatrix();
         maintainedZCoord = s_HitmanWorldMatrix.Trans.z + 1;
@@ -116,12 +119,6 @@ void ChaosEvents::ResetChaosData()
 {
     Logger::Debug("ChaosEvents destructor called.");
 
-    if (hm5CrippleBox) {
-        hm5CrippleBox->Deactivate(0);
-        delete hm5CrippleBox;
-        hm5CrippleBox = nullptr;
-    }
-
     counter = 0;
     activeEffects.clear();
     linesToRender.clear();
@@ -130,6 +127,12 @@ void ChaosEvents::ResetChaosData()
     isJumping = false;
     isAirWalking = false;
     canAirWalk = false;
+
+    if (hm5CrippleBox)
+    {
+        hm5CrippleBox->m_bActivateOnStart = false;
+        hm5CrippleBox = nullptr;
+    }
 }
 
 ChaosEvents::~ChaosEvents()
@@ -139,6 +142,8 @@ ChaosEvents::~ChaosEvents()
     // Only clear these values on destruct
     eventHandlers.clear();
     m_RepositoryProps.clear();
+    hm5CrippleBox->m_bActivateOnStart = false;
+    hm5CrippleBox = nullptr;
 }
 
 void ChaosEvents::ExecuteEvent(EChaosEvent event)
@@ -551,18 +556,17 @@ void ChaosEvents::ActivateJump()
 		Logger::Debug("No local hitman.");
 		return;
 	}
-	if (canJump && !isJumping) {
-		isJumping = true;
-        Functions::ZHM5BaseCharacter_ActivatePoweredRagdoll->Call(
-            SDK()->GetLocalPlayer().m_pInterfaceRef, 0.3f, true, false, 0.15f, false);
 
-        auto* localRagdoller = SDK()->GetLocalPlayer().m_pInterfaceRef->m_pRagdollHandler;
-        if (localRagdoller)
-        {
-            Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
-                localRagdoller, float4(0, 0, 0, 0), float4(0, 150, 250, 1), 1, false);
-        }
-	}
+    isJumping = true;
+    Functions::ZHM5BaseCharacter_ActivatePoweredRagdoll->Call(
+        SDK()->GetLocalPlayer().m_pInterfaceRef, 0.3f, true, false, 0.15f, false);
+
+    auto* localRagdoller = SDK()->GetLocalPlayer().m_pInterfaceRef->m_pRagdollHandler;
+    if (localRagdoller)
+    {
+        Functions::ZRagdollHandler_ApplyImpulseOnRagdoll->Call(
+            localRagdoller, float4(0, 0, 0, 0), float4(0, 150, 250, 1), 1, false);
+    }
 }
 
 void ChaosEvents::DeactivateJump()
@@ -716,45 +720,33 @@ void ChaosEvents::HandleReviveAura(EChaosEvent eventRef)
 }
 
 void ChaosEvents::HandleInfiniteAmmo(EChaosEvent eventRef)
-{
-    if (EventJustStarted(eventRef) && !hm5CrippleBox)
+{   
+    if (EventJustStarted(eventRef))
     {
         CreateCrippleBox();
-    }
-
-    if (EventJustStarted(eventRef) && hm5CrippleBox)
-    {
         auto s_LocalHitman = SDK()->GetLocalPlayer();
-
-        if (!s_LocalHitman) {
-            Logger::Debug("Local player is not alive.");
-            return;
-        }
-
         hm5CrippleBox->m_bActivateOnStart = true;
         hm5CrippleBox->m_rHitmanCharacter = s_LocalHitman;
         hm5CrippleBox->m_bLimitedAmmo = false;
         hm5CrippleBox->Activate(0);
     }
 
-    if (EventIsEnding(eventRef) && hm5CrippleBox)
+    if (EventIsEnding(eventRef))
     {
-        hm5CrippleBox->m_bLimitedAmmo = true;
         hm5CrippleBox->Deactivate(0);
+        hm5CrippleBox->m_bActivateOnStart = false;
     }
 }
 
 void ChaosEvents::HandleMake47Invincible(EChaosEvent eventRef)
 {
-    auto it = activeEffects.find(EChaosEvent::InfiniteAmmo);
-
-    if (!EventJustStarted(eventRef) && !hm5CrippleBox)
-    {
-        return;
-    }
-    
     auto player = SDK()->GetLocalPlayer();
-    if (player.m_pInterfaceRef->m_bIsInvincible == false)
+	if (!player) {
+		Logger::Debug("No local hitman");
+		return;
+	}
+
+    if (EventJustStarted(eventRef) && player.m_pInterfaceRef->m_bIsInvincible == false)
     {
         player.m_ref.SetProperty("m_bIsInvincible", true);
     }
@@ -762,7 +754,6 @@ void ChaosEvents::HandleMake47Invincible(EChaosEvent eventRef)
     if (EventIsEnding(eventRef))
     {
         player.m_ref.SetProperty("m_bIsInvincible", false);
-        return;
     }
 }
 

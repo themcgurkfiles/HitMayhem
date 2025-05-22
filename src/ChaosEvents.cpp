@@ -1208,3 +1208,79 @@ void ChaosEvents::SpawnJohnHitman(EChaosEvent eventRef)
         }
     }
 }
+
+void ChaosEvents::YouGotTheWholeSquadLaughing(EChaosEvent eventRef)
+{
+	if (!EventJustStarted(eventRef))
+		return;
+
+	auto s_LocalHitman = SDK()->GetLocalPlayer();
+	auto s_PlayerSpatial = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
+    const auto playerPos = s_PlayerSpatial->GetWorldMatrix().Trans;
+
+    for (int i = 0; i < *Globals::NextActorId; i++)
+    {
+        auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
+        auto actorSpatial = Globals::ActorManager->m_aActiveActors[i].m_ref.QueryInterface<ZSpatialEntity>();
+        const auto actorPos = actorSpatial->GetWorldMatrix().Trans;
+
+		// rotate the actor to face the player
+        float4 forward = playerPos - actorPos;
+        forward.z = 0;
+        forward = float4::Norm(forward);
+
+        float4 up = { 0.0f, 0.0f, 1.0f, 0.0f };
+
+        float4 left = float4::CrossProduct(up, forward);
+        left = float4::Norm(left);
+
+        up = float4::CrossProduct(forward, left);
+
+        // --- Apply the transform ---
+        SMatrix rotationMatrix;
+        rotationMatrix.Left = left;
+        rotationMatrix.Backward = { -forward.x, -forward.y, -forward.z, forward.w };
+        rotationMatrix.Up = up;
+        rotationMatrix.Trans = actorPos;
+
+        actorSpatial->SetWorldMatrix(rotationMatrix);
+    }
+}
+
+void ChaosEvents::TheRotConsumes(EChaosEvent eventRef)
+{
+    //if (!EventJustStarted(eventRef))
+    //    return;
+
+    auto s_LocalHitman = SDK()->GetLocalPlayer();
+    auto s_PlayerSpatial = s_LocalHitman.m_ref.QueryInterface<ZSpatialEntity>();
+    const auto playerPos = s_PlayerSpatial->GetWorldMatrix().Trans;
+
+    for (int i = 0; i < *Globals::NextActorId; i++)
+    {
+        auto& actor = Globals::ActorManager->m_aActiveActors[i].m_pInterfaceRef;
+        auto actorSpatial = Globals::ActorManager->m_aActiveActors[i].m_ref.QueryInterface<ZSpatialEntity>();
+        const auto actorPos = actorSpatial->GetWorldMatrix().Trans;
+
+        // rotate the actor to face the player
+        float4 forward = playerPos - actorPos;
+        forward.z = 0;
+        forward = float4::Norm(forward);
+
+        float4 up = { 0.0f, 0.0f, 1.0f, 0.0f };
+
+        float4 left = float4::CrossProduct(up, forward);
+        left = float4::Norm(left);
+
+        up = float4::CrossProduct(forward, left);
+
+        // --- Apply the transform ---
+        SMatrix rotationMatrix;
+        rotationMatrix.Left = left;
+        rotationMatrix.Backward = { -forward.x, -forward.y, -forward.z, forward.w };
+        rotationMatrix.Up = up;
+        rotationMatrix.Trans = actorPos;
+
+        actorSpatial->SetWorldMatrix(rotationMatrix);
+    }
+}

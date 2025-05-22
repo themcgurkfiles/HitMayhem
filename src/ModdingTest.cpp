@@ -115,6 +115,14 @@ void ModdingTest::OnDrawMenu() {
     if (ImGui::Button(ICON_MD_LOCK_RESET "Friendly Fire")) {
         if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::NPCsFriendlyFire); }
     }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "Damn, bro")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::YouGotTheWholeSquadLaughing); }
+    }
+
+    if (ImGui::Button(ICON_MD_LOCK_RESET "THE ROT CONSUMES")) {
+        if (m_ChaosEvents) { m_ChaosEvents->ExecuteEvent(ChaosEvents::EChaosEvent::TheRotConsumes); }
+    }
 }
 
 void ModdingTest::OnDrawUI(bool p_HasFocus) {  

@@ -47,6 +47,7 @@ public:
 		WalkOnAir,
 		Give47Boosters,
 		BecomeTheKashmirian,
+		TheRotConsumes,
 		//
 		DebugSampleLastEvent,   // Do not assign
 
@@ -65,6 +66,7 @@ public:
 		Hivemind, // Concept is to move all enemies when you move: gonna be a pain to do but funny if possible
 		YouGotTheWholeSquadLaughing, // All NPCs turn to 47 and possibly laugh at him
 		MyMainGoalIsToBlowUp, // Bind an explode event to a revive event (static EngineFunction<void(ZActor* th)>* ZActor_ReviveActor; in Functions.h)
+		FlipCamera, // Flip the camera upside down
 	};
 
 	struct ChaosEventData {
@@ -103,6 +105,8 @@ private:
 	void HandleNPCsFriendlyFire(EChaosEvent eventRef);
 	void BecomeTheKashmirian(EChaosEvent eventRef);
 	void SpawnJohnHitman(EChaosEvent eventRef);
+	void YouGotTheWholeSquadLaughing(EChaosEvent eventRef);
+	void TheRotConsumes(EChaosEvent eventRef);
 
 public:
 	//--- Event Processing ---//
@@ -192,6 +196,8 @@ public:
 			{ EChaosEvent::TeleportTargetRanChar,  {[this]() { HandleTeleportTargetsToRandomChar(EChaosEvent::TeleportTargetRanChar); }, "Random Target Teleport", 1}},
 			{ EChaosEvent::NPCsFriendlyFire,	   {[this]() { HandleNPCsFriendlyFire(EChaosEvent::NPCsFriendlyFire); }, "NPCs Can Friendly Fire", 1000} },
 			{ EChaosEvent::SpawnJohnHitman,		   {[this]() { SpawnJohnHitman(EChaosEvent::SpawnJohnHitman); }, "Spawn an NPC", 500} },
+			{ EChaosEvent::YouGotTheWholeSquadLaughing, {[this]() { YouGotTheWholeSquadLaughing(EChaosEvent::YouGotTheWholeSquadLaughing); }, "Damn bro, you got the whole squad laughing", 1000} },
+			{ EChaosEvent::TheRotConsumes, {[this]() { TheRotConsumes(EChaosEvent::TheRotConsumes); }, "THE ROT CONSUMES", 1000} },
 		};
 	}
 };

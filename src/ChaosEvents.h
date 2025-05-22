@@ -55,6 +55,7 @@ public:
 		NPCsFriendlyFire, // Currently broken and borked beyond belief, just trying to test raycast stuff
 		LaunchAllChars, // TODO: FIX THIS EFFECT, IT WORKS BUT THE NPCS DON'T EVER GET UP!
 		SpawnJohnHitman, // Just plain don't work, sadge
+		YouGotTheWholeSquadLaughing, // I LITERALLY messed this up so bad, I made it into another effect (the ROT)
 		RemoveAllWeapons,
 		MakeAllNPCsInvisible,
 		MakeAllNPCsEnforcers,
@@ -64,7 +65,6 @@ public:
 
 		// Concepts (no funcs made)
 		Hivemind, // Concept is to move all enemies when you move: gonna be a pain to do but funny if possible
-		YouGotTheWholeSquadLaughing, // All NPCs turn to 47 and possibly laugh at him
 		MyMainGoalIsToBlowUp, // Bind an explode event to a revive event (static EngineFunction<void(ZActor* th)>* ZActor_ReviveActor; in Functions.h)
 		FlipCamera, // Flip the camera upside down
 	};
@@ -185,6 +185,7 @@ public:
 			{ EChaosEvent::Give47Boosters,		   {[this]() { HandleGive47Boosters(EChaosEvent::Give47Boosters); }, "A Well-Needed Boost", 1000} },
 			{ EChaosEvent::BecomeTheKashmirian,	   {[this]() { BecomeTheKashmirian(EChaosEvent::BecomeTheKashmirian); }, "Become 'The Kashmirian'", 1000} },
 			{ EChaosEvent::InfiniteAmmo,           {[this]() { HandleInfiniteAmmo(EChaosEvent::InfiniteAmmo); }, "Infinite Ammo", 3000} },
+			{ EChaosEvent::TheRotConsumes,		   {[this]() { TheRotConsumes(EChaosEvent::TheRotConsumes); }, "THE ROT CONSUMES", 1000} },
 			
 			// Cut effects that work but have problems
 			{ EChaosEvent::LaunchAllChars,         {[this]() { HandleLaunchAllChars(EChaosEvent::LaunchAllChars); }, "Launch all NPCs", 100}},
@@ -197,7 +198,6 @@ public:
 			{ EChaosEvent::NPCsFriendlyFire,	   {[this]() { HandleNPCsFriendlyFire(EChaosEvent::NPCsFriendlyFire); }, "NPCs Can Friendly Fire", 1000} },
 			{ EChaosEvent::SpawnJohnHitman,		   {[this]() { SpawnJohnHitman(EChaosEvent::SpawnJohnHitman); }, "Spawn an NPC", 500} },
 			{ EChaosEvent::YouGotTheWholeSquadLaughing, {[this]() { YouGotTheWholeSquadLaughing(EChaosEvent::YouGotTheWholeSquadLaughing); }, "Damn bro, you got the whole squad laughing", 1000} },
-			{ EChaosEvent::TheRotConsumes, {[this]() { TheRotConsumes(EChaosEvent::TheRotConsumes); }, "THE ROT CONSUMES", 1000} },
 		};
 	}
 };
